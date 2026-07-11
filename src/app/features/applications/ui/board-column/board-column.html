@@ -1,0 +1,21 @@
+<div class="flex w-72 shrink-0 flex-col rounded-lg bg-slate-100 p-3">
+  <div class="mb-3 flex items-center justify-between px-1">
+    <h2 class="text-sm font-semibold text-slate-700">{{ label() }}</h2>
+    <span class="rounded-full bg-slate-200 px-2 py-0.5 text-xs text-slate-600">
+      {{ applications().length }}
+    </span>
+  </div>
+
+  <div
+    cdkDropList
+    [id]="columnId()"
+    [cdkDropListConnectedTo]="connectedTo()"
+    [cdkDropListData]="applications()"
+    (cdkDropListDropped)="dropped.emit($event)"
+    class="flex min-h-16 flex-col gap-2"
+  >
+    @for (application of applications(); track application.id) {
+      <app-application-card cdkDrag [application]="application" />
+    }
+  </div>
+</div>
