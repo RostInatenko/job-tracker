@@ -3,3 +3,7 @@
   [applicationsByStatus]="applicationsByStatus()"
   (dropped)="onDropped($event)"
 />
+
+@if (lastMove()) {
+  <app-undo-toast [message]="undoMessage()" (undo)="onUndo()" />
+}

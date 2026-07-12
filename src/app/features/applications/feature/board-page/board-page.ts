@@ -1,14 +1,17 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, effect, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Board } from '../../ui/board/board';
+import { UndoToast } from '../../ui/undo-toast/undo-toast';
 import { ApplicationStatus, BOARD_COLUMNS, JobApplication } from '../../data-access/application.model';
 import { ApplicationsActions } from '../../data-access/applications.actions';
-import { selectApplicationsByStatus } from '../../data-access/applications.selectors';
+import { selectApplicationsByStatus, selectLastMove } from '../../data-access/applications.selectors';
+
+const UNDO_WINDOW_MS = 5000;
 
 @Component({
   selector: 'app-board-page',
-  imports: [Board],
+  imports: [Board, UndoToast],
   templateUrl: './board-page.html',
 })
 export class BoardPage {
@@ -16,6 +19,34 @@ export class BoardPage {
 
   protected readonly columns = BOARD_COLUMNS;
   protected readonly applicationsByStatus = this.store.selectSignal(selectApplicationsByStatus);
+  protected readonly lastMove = this.store.selectSignal(selectLastMove);
+
+  protected readonly undoMessage = computed(() => {
+    const move = this.lastMove();
+
+    if (!move) {
+      return '';
+    }
+
+    const label = BOARD_COLUMNS.find((column) => column.status === move.status)?.label ?? move.status;
+    return `${move.company} moved to ${label}`;
+  });
+
+  constructor() {
+    effect((onCleanup) => {
+      const move = this.lastMove();
+
+      if (!move) {
+        return;
+      }
+
+      const timer = setTimeout(
+        () => this.store.dispatch(ApplicationsActions.lastMoveCleared()),
+        UNDO_WINDOW_MS,
+      );
+      onCleanup(() => clearTimeout(timer));
+    });
+  }
 
   protected onDropped({
     status,
@@ -38,5 +69,9 @@ export class BoardPage {
         currentIndex: event.currentIndex,
       }),
     );
+  }
+
+  protected onUndo(): void {
+    this.store.dispatch(ApplicationsActions.undoLastMove());
   }
 }
