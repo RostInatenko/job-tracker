@@ -1,26 +1,10 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { Store } from '@ngrx/store';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Board } from '../../ui/board/board';
-import {
-  ApplicationStatus,
-  BOARD_COLUMNS,
-  JobApplication,
-} from '../../data-access/application.model';
-import { MOCK_APPLICATIONS } from '../../data-access/mock-applications';
-
-function groupByStatus(
-  applications: JobApplication[],
-): Record<ApplicationStatus, JobApplication[]> {
-  const grouped = Object.fromEntries(
-    BOARD_COLUMNS.map((column) => [column.status, [] as JobApplication[]]),
-  ) as Record<ApplicationStatus, JobApplication[]>;
-
-  for (const application of applications) {
-    grouped[application.status].push(application);
-  }
-
-  return grouped;
-}
+import { ApplicationStatus, BOARD_COLUMNS, JobApplication } from '../../data-access/application.model';
+import { ApplicationsActions } from '../../data-access/applications.actions';
+import { selectApplicationsByStatus } from '../../data-access/applications.selectors';
 
 @Component({
   selector: 'app-board-page',
@@ -28,10 +12,10 @@ function groupByStatus(
   templateUrl: './board-page.html',
 })
 export class BoardPage {
-  protected readonly columns = BOARD_COLUMNS;
+  private readonly store = inject(Store);
 
-  private readonly applications = signal<JobApplication[]>(MOCK_APPLICATIONS);
-  protected readonly applicationsByStatus = computed(() => groupByStatus(this.applications()));
+  protected readonly columns = BOARD_COLUMNS;
+  protected readonly applicationsByStatus = this.store.selectSignal(selectApplicationsByStatus);
 
   protected onDropped({
     status,
@@ -46,23 +30,13 @@ export class BoardPage {
       return;
     }
 
-    this.applications.update((current) => {
-      const grouped = groupByStatus(current);
-      const sourceList = [...grouped[previousStatus]];
-      const [moved] = sourceList.splice(event.previousIndex, 1);
-      const movedApplication = { ...moved, status };
-
-      if (previousStatus === status) {
-        sourceList.splice(event.currentIndex, 0, movedApplication);
-        grouped[status] = sourceList;
-      } else {
-        const targetList = [...grouped[status]];
-        targetList.splice(event.currentIndex, 0, movedApplication);
-        grouped[previousStatus] = sourceList;
-        grouped[status] = targetList;
-      }
-
-      return BOARD_COLUMNS.flatMap((column) => grouped[column.status]);
-    });
+    this.store.dispatch(
+      ApplicationsActions.applicationMoved({
+        status,
+        previousStatus,
+        previousIndex: event.previousIndex,
+        currentIndex: event.currentIndex,
+      }),
+    );
   }
 }

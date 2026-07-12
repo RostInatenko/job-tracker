@@ -4,11 +4,15 @@ import { By } from '@angular/platform-browser';
 import { Board } from '../../ui/board/board';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { JobApplication } from '../../data-access/application.model';
+import { provideState, provideStore } from '@ngrx/store';
+import { APPLICATIONS_FEATURE_KEY } from '../../data-access/applications.selectors';
+import { applicationsReducer } from '../../data-access/applications.reducer';
 
 describe('BoardPage', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [BoardPage],
+      providers: [provideStore(), provideState(APPLICATIONS_FEATURE_KEY, applicationsReducer)],
     }).compileComponents();
   });
 
