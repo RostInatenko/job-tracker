@@ -13,3 +13,8 @@ const { selectAll } = applicationsAdapter.getSelectors();
 export const selectAllApplications = createSelector(selectApplicationsState, selectAll);
 
 export const selectApplicationsByStatus = createSelector(selectAllApplications, groupByStatus);
+
+export const selectLastMove = createSelector(
+  selectApplicationsState,
+  (state) => state.lastMove,
+);

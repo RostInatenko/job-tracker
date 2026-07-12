@@ -1,42 +1,59 @@
 import { createReducer, on } from '@ngrx/store';
 import { createEntityAdapter, EntityState } from '@ngrx/entity';
-import { BOARD_COLUMNS, JobApplication } from './application.model';
+import { JobApplication, MovePayload } from './application.model';
 import { MOCK_APPLICATIONS } from './mock-applications';
 import { ApplicationsActions } from './applications.actions';
 import { groupByStatus } from './group-by-status';
+import { applyMove, invertMove } from './apply-move';
 
-export type ApplicationsState = EntityState<JobApplication>;
+export interface LastMove extends MovePayload {
+  applicationId: string;
+  company: string;
+}
+
+export interface ApplicationsState extends EntityState<JobApplication> {
+  lastMove: LastMove | null;
+}
 
 export const applicationsAdapter = createEntityAdapter<JobApplication>();
 
-export const initialApplicationsState: ApplicationsState = applicationsAdapter.setAll(
-  MOCK_APPLICATIONS,
-  applicationsAdapter.getInitialState(),
-);
+export const initialApplicationsState: ApplicationsState = {
+  ...applicationsAdapter.setAll(MOCK_APPLICATIONS, applicationsAdapter.getInitialState()),
+  lastMove: null,
+};
 
 export const applicationsReducer = createReducer(
   initialApplicationsState,
-  on(
-    ApplicationsActions.applicationMoved,
-    (state, { status, previousStatus, previousIndex, currentIndex }) => {
-      const grouped = groupByStatus(applicationsAdapter.getSelectors().selectAll(state));
+  on(ApplicationsActions.applicationMoved, (state, move) => {
+    const applications = applicationsAdapter.getSelectors().selectAll(state);
+    const movedApplication = groupByStatus(applications)[move.previousStatus][move.previousIndex];
 
-      const sourceList = [...grouped[previousStatus]];
-      const [moved] = sourceList.splice(previousIndex, 1);
-      const movedApplication: JobApplication = { ...moved, status };
+    const reordered = applyMove(applications, move);
 
-      if (previousStatus === status) {
-        sourceList.splice(currentIndex, 0, movedApplication);
-        grouped[status] = sourceList;
-      } else {
-        const targetList = [...grouped[status]];
-        targetList.splice(currentIndex, 0, movedApplication);
-        grouped[previousStatus] = sourceList;
-        grouped[status] = targetList;
-      }
+    return {
+      ...applicationsAdapter.setAll(reordered, state),
+      lastMove: {
+        ...move,
+        applicationId: movedApplication.id,
+        company: movedApplication.company,
+      },
+    };
+  }),
+  on(ApplicationsActions.undoLastMove, (state) => {
+    if (!state.lastMove) {
+      return state;
+    }
 
-      const reordered = BOARD_COLUMNS.flatMap((column) => grouped[column.status]);
-      return applicationsAdapter.setAll(reordered, state);
-    },
-  ),
+    const applications = applicationsAdapter.getSelectors().selectAll(state);
+    const reordered = applyMove(applications, invertMove(state.lastMove));
+
+    return {
+      ...applicationsAdapter.setAll(reordered, state),
+      lastMove: null,
+    };
+  }),
+  on(ApplicationsActions.lastMoveCleared, (state) => ({
+    ...state,
+    lastMove: null,
+  })),
 );

@@ -19,7 +19,10 @@ describe('applicationsReducer', () => {
   };
 
   function createState(applications: JobApplication[]): ApplicationsState {
-    return applicationsAdapter.setAll(applications, applicationsAdapter.getInitialState());
+    return {
+      ...applicationsAdapter.setAll(applications, applicationsAdapter.getInitialState()),
+      lastMove: null,
+    };
   }
 
   it('moves an application to a different column and updates its status', () => {
@@ -58,5 +61,52 @@ describe('applicationsReducer', () => {
       .selectAll(nextState)
       .map((application) => application.id);
     expect(orderedIds).toEqual(['3', '1']);
+  });
+
+  it('reverses the last move and clears it on undo', () => {
+    const state = createState([applied, interview]);
+    const movedState = applicationsReducer(
+      state,
+      ApplicationsActions.applicationMoved({
+        status: 'interview',
+        previousStatus: 'applied',
+        previousIndex: 0,
+        currentIndex: 0,
+      }),
+    );
+
+    const undoneState = applicationsReducer(movedState, ApplicationsActions.undoLastMove());
+
+    const moved = applicationsAdapter.getSelectors().selectEntities(undoneState)['1'];
+    expect(moved?.status).toBe('applied');
+    expect(undoneState.lastMove).toBeNull();
+  });
+
+  it('does nothing when undoing with no last move', () => {
+    const state = createState([applied, interview]);
+
+    const nextState = applicationsReducer(state, ApplicationsActions.undoLastMove());
+
+    expect(nextState).toBe(state);
+  });
+
+  it('clears the last move without changing entities', () => {
+    const state = createState([applied, interview]);
+    const movedState = applicationsReducer(
+      state,
+      ApplicationsActions.applicationMoved({
+        status: 'interview',
+        previousStatus: 'applied',
+        previousIndex: 0,
+        currentIndex: 0,
+      }),
+    );
+
+    const clearedState = applicationsReducer(movedState, ApplicationsActions.lastMoveCleared());
+
+    expect(clearedState.lastMove).toBeNull();
+    expect(applicationsAdapter.getSelectors().selectEntities(clearedState)['1']?.status).toBe(
+      'interview',
+    );
   });
 });
