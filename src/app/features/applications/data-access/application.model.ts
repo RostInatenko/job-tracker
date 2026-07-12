@@ -21,3 +21,10 @@ export const BOARD_COLUMNS: readonly BoardColumnConfig[] = [
   { status: 'offer', label: 'Offer' },
   { status: 'rejected', label: 'Rejected' },
 ];
+
+export interface MovePayload {
+  status: ApplicationStatus;
+  previousStatus: ApplicationStatus;
+  previousIndex: number;
+  currentIndex: number;
+}

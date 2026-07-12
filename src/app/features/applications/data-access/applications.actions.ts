@@ -1,14 +1,11 @@
-import { createActionGroup, props } from '@ngrx/store';
-import { ApplicationStatus } from './application.model';
+import { createActionGroup, emptyProps, props } from '@ngrx/store';
+import { MovePayload } from './application.model';
 
 export const ApplicationsActions = createActionGroup({
   source: 'Applications',
   events: {
-    'Application Moved': props<{
-      status: ApplicationStatus;
-      previousStatus: ApplicationStatus;
-      previousIndex: number;
-      currentIndex: number;
-    }>(),
+    'Application Moved': props<MovePayload>(),
+    'Undo Last Move': emptyProps(),
+    'Last Move Cleared': emptyProps(),
   },
 });
