@@ -1,0 +1,12 @@
+<div
+  class="fixed bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-4 rounded-md bg-slate-900 px-4 py-3 text-sm text-white shadow-lg"
+>
+  <span>{{ message() }}</span>
+  <button
+    type="button"
+    class="font-medium text-blue-300 hover:text-blue-200"
+    (click)="undo.emit()"
+  >
+    Undo
+  </button>
+</div>
