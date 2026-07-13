@@ -109,4 +109,50 @@ describe('applicationsReducer', () => {
       'interview',
     );
   });
+
+  it('adds a new application and clears the last move', () => {
+    const state = createState([applied]);
+    const offer: JobApplication = {
+      id: '4',
+      company: 'BrightPath Media',
+      role: 'Frontend Developer',
+      status: 'offer',
+      dateApplied: '2026-07-10',
+    };
+
+    const nextState = applicationsReducer(
+      state,
+      ApplicationsActions.applicationAdded({ application: offer }),
+    );
+
+    expect(applicationsAdapter.getSelectors().selectEntities(nextState)['4']).toEqual(offer);
+    expect(nextState.lastMove).toBeNull();
+  });
+
+  it('replaces an existing application on update and clears the last move', () => {
+    const state = createState([applied, interview]);
+    const updated: JobApplication = { ...applied, company: 'Nordic Fintech Renamed' };
+
+    const nextState = applicationsReducer(
+      state,
+      ApplicationsActions.applicationUpdated({ application: updated }),
+    );
+
+    expect(applicationsAdapter.getSelectors().selectEntities(nextState)['1']?.company).toBe(
+      'Nordic Fintech Renamed',
+    );
+    expect(nextState.lastMove).toBeNull();
+  });
+
+  it('removes an application on delete and clears the last move', () => {
+    const state = createState([applied, interview]);
+
+    const nextState = applicationsReducer(
+      state,
+      ApplicationsActions.applicationDeleted({ id: '1' }),
+    );
+
+    expect(applicationsAdapter.getSelectors().selectEntities(nextState)['1']).toBeUndefined();
+    expect(nextState.lastMove).toBeNull();
+  });
 });

@@ -56,4 +56,16 @@ export const applicationsReducer = createReducer(
     ...state,
     lastMove: null,
   })),
+  on(ApplicationsActions.applicationAdded, (state, { application }) => ({
+    ...applicationsAdapter.addOne(application, state),
+    lastMove: null,
+  })),
+  on(ApplicationsActions.applicationUpdated, (state, { application }) => ({
+    ...applicationsAdapter.setOne(application, state),
+    lastMove: null,
+  })),
+  on(ApplicationsActions.applicationDeleted, (state, { id }) => ({
+    ...applicationsAdapter.removeOne(id, state),
+    lastMove: null,
+  })),
 );
