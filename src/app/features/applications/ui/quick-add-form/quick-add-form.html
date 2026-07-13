@@ -1,0 +1,28 @@
+<form (ngSubmit)="onSubmit()" class="mb-6 flex flex-wrap items-end gap-3">
+  <label class="text-sm">
+    <span class="mb-1 block font-medium text-slate-700">Company</span>
+    <input
+      name="company"
+      [(ngModel)]="company"
+      required
+      class="rounded-md border border-slate-300 px-3 py-2 text-sm"
+    />
+  </label>
+
+  <label class="text-sm">
+    <span class="mb-1 block font-medium text-slate-700">Role</span>
+    <input
+      name="role"
+      [(ngModel)]="role"
+      required
+      class="rounded-md border border-slate-300 px-3 py-2 text-sm"
+    />
+  </label>
+
+  <button
+    type="submit"
+    class="rounded-md bg-slate-900 px-4 py-2 text-sm text-white hover:bg-slate-800"
+  >
+    Add application
+  </button>
+</form>
