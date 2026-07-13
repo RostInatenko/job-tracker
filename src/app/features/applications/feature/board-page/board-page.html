@@ -1,9 +1,21 @@
+<app-quick-add-form (added)="onQuickAdd($event)" />
+
 <app-board
   [columns]="columns"
   [applicationsByStatus]="applicationsByStatus()"
   (dropped)="onDropped($event)"
+  (edit)="onEdit($event)"
 />
 
 @if (lastMove()) {
   <app-undo-toast [message]="undoMessage()" (undo)="onUndo()" />
+}
+
+@if (editingApplication(); as application) {
+  <app-application-edit-modal
+    [application]="application"
+    (save)="onSaveEdit($event)"
+    (delete)="onDeleteEdit($event)"
+    (close)="onCloseEdit()"
+  />
 }
