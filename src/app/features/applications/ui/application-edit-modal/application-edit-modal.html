@@ -1,0 +1,89 @@
+<div (click)="close.emit()" class="fixed inset-0 flex items-center justify-center bg-black/40 p-4">
+  <form
+    [formGroup]="form"
+    (ngSubmit)="onSave()"
+    (click)="$event.stopPropagation()"
+    class="w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
+  >
+    <h2 class="mb-4 text-lg font-semibold text-slate-900">Edit application</h2>
+
+    <label class="mb-3 block text-sm">
+      <span class="mb-1 block font-medium text-slate-700">Company</span>
+      <input
+        formControlName="company"
+        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+      />
+    </label>
+
+    <label class="mb-3 block text-sm">
+      <span class="mb-1 block font-medium text-slate-700">Role</span>
+      <input
+        formControlName="role"
+        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+      />
+    </label>
+
+    <label class="mb-3 block text-sm">
+      <span class="mb-1 block font-medium text-slate-700">Status</span>
+      <select
+        formControlName="status"
+        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+      >
+        @for (column of columns; track column.status) {
+          <option [value]="column.status">{{ column.label }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="mb-3 block text-sm">
+      <span class="mb-1 block font-medium text-slate-700">Date applied</span>
+      <input
+        type="date"
+        formControlName="dateApplied"
+        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+      />
+    </label>
+
+    <label class="mb-3 block text-sm">
+      <span class="mb-1 block font-medium text-slate-700">Notes</span>
+      <textarea
+        formControlName="notes"
+        rows="3"
+        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+      ></textarea>
+    </label>
+
+    <label class="mb-4 block text-sm">
+      <span class="mb-1 block font-medium text-slate-700">Job link</span>
+      <input
+        formControlName="link"
+        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+      />
+    </label>
+
+    <div class="flex items-center justify-between">
+      <button
+        type="button"
+        (click)="onDelete()"
+        class="text-sm font-medium text-red-600 hover:text-red-700"
+      >
+        Delete
+      </button>
+      <div class="flex gap-2">
+        <button
+          type="button"
+          (click)="close.emit()"
+          class="rounded-md px-3 py-2 text-sm text-slate-600 hover:bg-slate-100"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="rounded-md bg-slate-900 px-3 py-2 text-sm text-white hover:bg-slate-800"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
