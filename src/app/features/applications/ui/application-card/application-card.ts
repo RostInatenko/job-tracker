@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { JobApplication } from '../../data-access/application.model';
 
@@ -9,4 +9,5 @@ import { JobApplication } from '../../data-access/application.model';
 })
 export class ApplicationCard {
   application = input.required<JobApplication>();
+  edit = output<JobApplication>();
 }

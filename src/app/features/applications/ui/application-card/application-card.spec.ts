@@ -41,4 +41,32 @@ describe('ApplicationCard', () => {
     const link = (fixture.nativeElement as HTMLElement).querySelector('a');
     expect(link).toBeNull();
   });
+
+  it('emits edit with the application when the card is clicked', () => {
+    const fixture = createComponent();
+    let emitted: JobApplication | undefined;
+    fixture.componentInstance.edit.subscribe((application) => (emitted = application));
+
+    (fixture.nativeElement as HTMLElement).querySelector('article')?.dispatchEvent(
+      new MouseEvent('click', { bubbles: true }),
+    );
+
+    expect(emitted).toEqual(mockApplication);
+  });
+
+  it('does not emit edit when the posting link is clicked', () => {
+    const withLink: JobApplication = { ...mockApplication, link: 'https://example.com/job' };
+    const fixture = TestBed.createComponent(ApplicationCard);
+    fixture.componentRef.setInput('application', withLink);
+    fixture.detectChanges();
+
+    let emitted = false;
+    fixture.componentInstance.edit.subscribe(() => (emitted = true));
+
+    (fixture.nativeElement as HTMLElement)
+      .querySelector('a')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(emitted).toBe(false);
+  });
 });

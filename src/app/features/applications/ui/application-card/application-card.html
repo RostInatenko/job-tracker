@@ -1,4 +1,7 @@
-<article class="rounded-md border border-slate-200 bg-white p-3 shadow-sm">
+<article
+  (click)="edit.emit(application())"
+  class="cursor-pointer rounded-md border border-slate-200 bg-white p-3 shadow-sm"
+>
   <p class="font-medium text-slate-900">{{ application().company }}</p>
   <p class="text-sm text-slate-600">{{ application().role }}</p>
   <p class="mt-2 text-xs text-slate-400">{{ application().dateApplied | date: 'mediumDate' }}</p>
@@ -12,6 +15,7 @@
       [href]="application().link"
       target="_blank"
       rel="noopener noreferrer"
+      (click)="$event.stopPropagation()"
       class="mt-2 inline-block text-xs text-blue-600 hover:underline"
     >
       View posting

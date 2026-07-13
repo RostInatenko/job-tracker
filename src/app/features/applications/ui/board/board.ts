@@ -17,6 +17,7 @@ export class Board {
   applicationsByStatus = input.required<Record<ApplicationStatus, JobApplication[]>>();
 
   dropped = output<{ status: ApplicationStatus; event: CdkDragDrop<JobApplication[]> }>();
+  edit = output<JobApplication>();
 
   columnIds = computed(() => this.columns().map((column) => column.status));
 }

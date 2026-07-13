@@ -6,6 +6,7 @@
       [connectedTo]="columnIds()"
       [applications]="applicationsByStatus()[column.status]"
       (dropped)="dropped.emit({ status: column.status, event: $event })"
+      (edit)="edit.emit($event)"
     />
   }
 </div>

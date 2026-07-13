@@ -15,4 +15,5 @@ export class BoardColumn {
   applications = input.required<JobApplication[]>();
 
   dropped = output<CdkDragDrop<JobApplication[]>>();
+  edit = output<JobApplication>();
 }
