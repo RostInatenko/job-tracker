@@ -12,6 +12,7 @@ import {
   selectError,
   selectLastMove,
   selectLoading,
+  selectMutationError,
 } from '../../data-access/applications.selectors';
 
 const UNDO_WINDOW_MS = 5000;
@@ -29,6 +30,7 @@ export class BoardPage {
   protected readonly lastMove = this.store.selectSignal(selectLastMove);
   protected readonly loading = this.store.selectSignal(selectLoading);
   protected readonly error = this.store.selectSignal(selectError);
+  protected readonly mutationError = this.store.selectSignal(selectMutationError);
   protected readonly editingApplication = signal<JobApplication | null>(null);
 
   protected readonly undoMessage = computed(() => {
@@ -84,11 +86,21 @@ export class BoardPage {
   }
 
   protected onUndo(): void {
-    this.store.dispatch(ApplicationsActions.undoLastMove());
+    const move = this.lastMove();
+
+    if (!move) {
+      return;
+    }
+
+    this.store.dispatch(ApplicationsActions.undoLastMove({ applicationId: move.applicationId }));
   }
 
   protected onRetryLoad(): void {
     this.store.dispatch(ApplicationsActions.loadApplications());
+  }
+
+  protected onDismissMutationError(): void {
+    this.store.dispatch(ApplicationsActions.mutationErrorCleared());
   }
 
   protected onQuickAdd({ company, role }: { company: string; role: string }): void {
@@ -114,12 +126,24 @@ export class BoardPage {
   }
 
   protected onSaveEdit(application: JobApplication): void {
-    this.store.dispatch(ApplicationsActions.applicationUpdated({ application }));
+    const previous = this.editingApplication();
+
+    if (!previous) {
+      return;
+    }
+
+    this.store.dispatch(ApplicationsActions.applicationUpdated({ application, previous }));
     this.editingApplication.set(null);
   }
 
-  protected onDeleteEdit(id: string): void {
-    this.store.dispatch(ApplicationsActions.applicationDeleted({ id }));
+  protected onDeleteEdit(): void {
+    const application = this.editingApplication();
+
+    if (!application) {
+      return;
+    }
+
+    this.store.dispatch(ApplicationsActions.applicationDeleted({ application }));
     this.editingApplication.set(null);
   }
 }

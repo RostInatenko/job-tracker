@@ -1,5 +1,14 @@
 <app-quick-add-form (added)="onQuickAdd($event)" />
 
+@if (mutationError(); as message) {
+  <div class="mb-4 flex items-center gap-3 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+    <span>{{ message }}</span>
+    <button type="button" (click)="onDismissMutationError()" class="font-medium underline hover:no-underline">
+      Dismiss
+    </button>
+  </div>
+}
+
 @if (loading()) {
   <p class="text-sm text-slate-500">Loading your applications…</p>
 } @else if (error(); as message) {
@@ -26,7 +35,7 @@
   <app-application-edit-modal
     [application]="application"
     (save)="onSaveEdit($event)"
-    (delete)="onDeleteEdit($event)"
+    (delete)="onDeleteEdit()"
     (close)="onCloseEdit()"
   />
 }

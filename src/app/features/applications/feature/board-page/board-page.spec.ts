@@ -184,7 +184,7 @@ describe('BoardPage', () => {
 
     const modalDebugEl = fixture.debugElement.query(By.directive(ApplicationEditModal));
     const modal = modalDebugEl.componentInstance as ApplicationEditModal;
-    modal.delete.emit('1');
+    modal.delete.emit();
     fixture.detectChanges();
 
     const board = boardDebugEl.componentInstance as Board;
@@ -192,5 +192,29 @@ describe('BoardPage', () => {
       false,
     );
     expect(fixture.debugElement.query(By.directive(ApplicationEditModal))).toBeNull();
+  });
+
+  it('shows a dismissable mutation error banner without hiding the board', () => {
+    const fixture = createLoadedFixture();
+
+    const store = TestBed.inject(Store);
+    store.dispatch(
+      ApplicationsActions.applicationAddFailed({
+        application: testApplications[0],
+        error: 'could not save',
+      }),
+    );
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('could not save');
+    expect(fixture.debugElement.query(By.directive(Board))).toBeTruthy();
+
+    const dismissButton = fixture.debugElement
+      .queryAll(By.css('button'))
+      .find((button) => button.nativeElement.textContent.trim() === 'Dismiss');
+    dismissButton?.nativeElement.click();
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).textContent).not.toContain('could not save');
   });
 });
