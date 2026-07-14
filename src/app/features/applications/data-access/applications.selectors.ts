@@ -8,9 +8,11 @@ export const selectApplicationsState = createFeatureSelector<ApplicationsState>(
   APPLICATIONS_FEATURE_KEY,
 );
 
-const { selectAll } = applicationsAdapter.getSelectors();
+const { selectAll, selectEntities } = applicationsAdapter.getSelectors();
 
 export const selectAllApplications = createSelector(selectApplicationsState, selectAll);
+
+export const selectApplicationEntities = createSelector(selectApplicationsState, selectEntities);
 
 export const selectApplicationsByStatus = createSelector(selectAllApplications, groupByStatus);
 
@@ -22,3 +24,8 @@ export const selectLastMove = createSelector(
 export const selectLoading = createSelector(selectApplicationsState, (state) => state.loading);
 
 export const selectError = createSelector(selectApplicationsState, (state) => state.error);
+
+export const selectMutationError = createSelector(
+  selectApplicationsState,
+  (state) => state.mutationError,
+);
