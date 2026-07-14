@@ -7,7 +7,12 @@ import { QuickAddForm } from '../../ui/quick-add-form/quick-add-form';
 import { ApplicationEditModal } from '../../ui/application-edit-modal/application-edit-modal';
 import { ApplicationStatus, BOARD_COLUMNS, JobApplication } from '../../data-access/application.model';
 import { ApplicationsActions } from '../../data-access/applications.actions';
-import { selectApplicationsByStatus, selectLastMove } from '../../data-access/applications.selectors';
+import {
+  selectApplicationsByStatus,
+  selectError,
+  selectLastMove,
+  selectLoading,
+} from '../../data-access/applications.selectors';
 
 const UNDO_WINDOW_MS = 5000;
 
@@ -22,6 +27,8 @@ export class BoardPage {
   protected readonly columns = BOARD_COLUMNS;
   protected readonly applicationsByStatus = this.store.selectSignal(selectApplicationsByStatus);
   protected readonly lastMove = this.store.selectSignal(selectLastMove);
+  protected readonly loading = this.store.selectSignal(selectLoading);
+  protected readonly error = this.store.selectSignal(selectError);
   protected readonly editingApplication = signal<JobApplication | null>(null);
 
   protected readonly undoMessage = computed(() => {
@@ -36,6 +43,8 @@ export class BoardPage {
   });
 
   constructor() {
+    this.store.dispatch(ApplicationsActions.loadApplications());
+
     effect((onCleanup) => {
       const move = this.lastMove();
 
@@ -76,6 +85,10 @@ export class BoardPage {
 
   protected onUndo(): void {
     this.store.dispatch(ApplicationsActions.undoLastMove());
+  }
+
+  protected onRetryLoad(): void {
+    this.store.dispatch(ApplicationsActions.loadApplications());
   }
 
   protected onQuickAdd({ company, role }: { company: string; role: string }): void {

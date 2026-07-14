@@ -1,15 +1,26 @@
 import { TestBed } from '@angular/core/testing';
 import { BoardPage } from './board-page';
 import { By } from '@angular/platform-browser';
+import { Store, provideState, provideStore } from '@ngrx/store';
 import { Board } from '../../ui/board/board';
 import { UndoToast } from '../../ui/undo-toast/undo-toast';
 import { QuickAddForm } from '../../ui/quick-add-form/quick-add-form';
 import { ApplicationEditModal } from '../../ui/application-edit-modal/application-edit-modal';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { JobApplication } from '../../data-access/application.model';
-import { provideState, provideStore } from '@ngrx/store';
 import { APPLICATIONS_FEATURE_KEY } from '../../data-access/applications.selectors';
 import { applicationsReducer } from '../../data-access/applications.reducer';
+import { ApplicationsActions } from '../../data-access/applications.actions';
+
+const testApplications: JobApplication[] = [
+  {
+    id: '1',
+    company: 'Nordic Fintech',
+    role: 'Angular Developer',
+    status: 'applied',
+    dateApplied: '2026-06-28',
+  },
+];
 
 describe('BoardPage', () => {
   beforeEach(async () => {
@@ -19,14 +30,51 @@ describe('BoardPage', () => {
     }).compileComponents();
   });
 
+  function createLoadedFixture() {
+    const fixture = TestBed.createComponent(BoardPage);
+    fixture.detectChanges();
+
+    const store = TestBed.inject(Store);
+    store.dispatch(ApplicationsActions.loadApplicationsSuccess({ applications: testApplications }));
+    fixture.detectChanges();
+
+    return fixture;
+  }
+
   it('should create', () => {
     const fixture = TestBed.createComponent(BoardPage);
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('moves the application into the target column and out of the source column', () => {
+  it('shows a loading message before the applications arrive', () => {
     const fixture = TestBed.createComponent(BoardPage);
     fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Loading');
+    expect(fixture.debugElement.query(By.directive(Board))).toBeNull();
+  });
+
+  it('shows an error with a retry option when loading fails', () => {
+    const fixture = TestBed.createComponent(BoardPage);
+    fixture.detectChanges();
+
+    const store = TestBed.inject(Store);
+    store.dispatch(ApplicationsActions.loadApplicationsFailure({ error: 'network error' }));
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('network error');
+
+    const retryButton = fixture.debugElement
+      .queryAll(By.css('button'))
+      .find((button) => button.nativeElement.textContent.trim() === 'Retry');
+    retryButton?.nativeElement.click();
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Loading');
+  });
+
+  it('moves the application into the target column and out of the source column', () => {
+    const fixture = createLoadedFixture();
     const boardDebugEl = fixture.debugElement.query(By.directive(Board));
     const payload = { status: 'interview', event: { previousContainer: { id: 'applied' }, previousIndex: 0, currentIndex: 0 } as CdkDragDrop<JobApplication[]> };
 
@@ -43,8 +91,7 @@ describe('BoardPage', () => {
   });
 
   it('shows an undo toast after a move and reverses it on click', () => {
-    const fixture = TestBed.createComponent(BoardPage);
-    fixture.detectChanges();
+    const fixture = createLoadedFixture();
     const boardDebugEl = fixture.debugElement.query(By.directive(Board));
     const payload = {
       status: 'interview',
@@ -72,8 +119,7 @@ describe('BoardPage', () => {
   });
 
   it('adds a new application from the quick-add form', () => {
-    const fixture = TestBed.createComponent(BoardPage);
-    fixture.detectChanges();
+    const fixture = createLoadedFixture();
 
     const quickAddDebugEl = fixture.debugElement.query(By.directive(QuickAddForm));
     quickAddDebugEl.triggerEventHandler('added', { company: 'Vantage Health', role: 'Frontend Engineer' });
@@ -91,8 +137,7 @@ describe('BoardPage', () => {
   });
 
   it('opens the edit modal for a clicked card and saves changes', () => {
-    const fixture = TestBed.createComponent(BoardPage);
-    fixture.detectChanges();
+    const fixture = createLoadedFixture();
     const boardDebugEl = fixture.debugElement.query(By.directive(Board));
 
     boardDebugEl.triggerEventHandler('edit', {
@@ -125,8 +170,7 @@ describe('BoardPage', () => {
   });
 
   it('deletes the application being edited and closes the modal', () => {
-    const fixture = TestBed.createComponent(BoardPage);
-    fixture.detectChanges();
+    const fixture = createLoadedFixture();
     const boardDebugEl = fixture.debugElement.query(By.directive(Board));
 
     boardDebugEl.triggerEventHandler('edit', {
