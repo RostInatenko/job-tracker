@@ -63,14 +63,14 @@ describe('ApplicationEditModal', () => {
     expect(emitted).toBe(false);
   });
 
-  it('emits delete with the application id', () => {
+  it('emits delete when the delete button is clicked', () => {
     const fixture = createComponent();
-    let deletedId: string | undefined;
-    fixture.componentInstance.delete.subscribe((id) => (deletedId = id));
+    let emitted = false;
+    fixture.componentInstance.delete.subscribe(() => (emitted = true));
 
     fixture.componentInstance['onDelete']();
 
-    expect(deletedId).toBe('1');
+    expect(emitted).toBe(true);
   });
 
   it('emits close when the backdrop is clicked', () => {

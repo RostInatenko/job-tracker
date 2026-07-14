@@ -12,7 +12,7 @@ export class ApplicationEditModal implements OnInit {
 
   application = input.required<JobApplication>();
   save = output<JobApplication>();
-  delete = output<string>();
+  delete = output<void>();
   close = output<void>();
 
   protected readonly columns = BOARD_COLUMNS;
@@ -52,6 +52,6 @@ export class ApplicationEditModal implements OnInit {
   }
 
   protected onDelete(): void {
-    this.delete.emit(this.application().id);
+    this.delete.emit();
   }
 }
