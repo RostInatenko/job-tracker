@@ -24,6 +24,7 @@ describe('applicationsReducer', () => {
       lastMove: null,
       loading: false,
       error: null,
+      mutationError: null,
     };
   }
 
@@ -65,6 +66,36 @@ describe('applicationsReducer', () => {
     expect(orderedIds).toEqual(['3', '1']);
   });
 
+  it('reverses the move and sets a mutation error when persisting a move fails', () => {
+    const state = createState([applied, interview]);
+    const movedState = applicationsReducer(
+      state,
+      ApplicationsActions.applicationMoved({
+        status: 'interview',
+        previousStatus: 'applied',
+        previousIndex: 0,
+        currentIndex: 0,
+      }),
+    );
+
+    const rolledBackState = applicationsReducer(
+      movedState,
+      ApplicationsActions.applicationMoveFailed({
+        move: {
+          status: 'interview',
+          previousStatus: 'applied',
+          previousIndex: 0,
+          currentIndex: 0,
+        },
+        error: 'network error',
+      }),
+    );
+
+    const moved = applicationsAdapter.getSelectors().selectEntities(rolledBackState)['1'];
+    expect(moved?.status).toBe('applied');
+    expect(rolledBackState.mutationError).toBe('network error');
+  });
+
   it('reverses the last move and clears it on undo', () => {
     const state = createState([applied, interview]);
     const movedState = applicationsReducer(
@@ -77,7 +108,10 @@ describe('applicationsReducer', () => {
       }),
     );
 
-    const undoneState = applicationsReducer(movedState, ApplicationsActions.undoLastMove());
+    const undoneState = applicationsReducer(
+      movedState,
+      ApplicationsActions.undoLastMove({ applicationId: '1' }),
+    );
 
     const moved = applicationsAdapter.getSelectors().selectEntities(undoneState)['1'];
     expect(moved?.status).toBe('applied');
@@ -87,9 +121,23 @@ describe('applicationsReducer', () => {
   it('does nothing when undoing with no last move', () => {
     const state = createState([applied, interview]);
 
-    const nextState = applicationsReducer(state, ApplicationsActions.undoLastMove());
+    const nextState = applicationsReducer(
+      state,
+      ApplicationsActions.undoLastMove({ applicationId: '1' }),
+    );
 
     expect(nextState).toBe(state);
+  });
+
+  it('sets a mutation error when persisting an undo fails', () => {
+    const state = createState([applied, interview]);
+
+    const nextState = applicationsReducer(
+      state,
+      ApplicationsActions.undoLastMoveFailed({ error: 'network error' }),
+    );
+
+    expect(nextState.mutationError).toBe('network error');
   });
 
   it('clears the last move without changing entities', () => {
@@ -131,13 +179,36 @@ describe('applicationsReducer', () => {
     expect(nextState.lastMove).toBeNull();
   });
 
+  it('removes the application and sets a mutation error when persisting an add fails', () => {
+    const state = createState([applied]);
+    const offer: JobApplication = {
+      id: '4',
+      company: 'BrightPath Media',
+      role: 'Frontend Developer',
+      status: 'offer',
+      dateApplied: '2026-07-10',
+    };
+    const addedState = applicationsReducer(
+      state,
+      ApplicationsActions.applicationAdded({ application: offer }),
+    );
+
+    const nextState = applicationsReducer(
+      addedState,
+      ApplicationsActions.applicationAddFailed({ application: offer, error: 'network error' }),
+    );
+
+    expect(applicationsAdapter.getSelectors().selectEntities(nextState)['4']).toBeUndefined();
+    expect(nextState.mutationError).toBe('network error');
+  });
+
   it('replaces an existing application on update and clears the last move', () => {
     const state = createState([applied, interview]);
     const updated: JobApplication = { ...applied, company: 'Nordic Fintech Renamed' };
 
     const nextState = applicationsReducer(
       state,
-      ApplicationsActions.applicationUpdated({ application: updated }),
+      ApplicationsActions.applicationUpdated({ application: updated, previous: applied }),
     );
 
     expect(applicationsAdapter.getSelectors().selectEntities(nextState)['1']?.company).toBe(
@@ -146,16 +217,59 @@ describe('applicationsReducer', () => {
     expect(nextState.lastMove).toBeNull();
   });
 
+  it('restores the previous value and sets a mutation error when persisting an update fails', () => {
+    const state = createState([applied, interview]);
+    const updated: JobApplication = { ...applied, company: 'Nordic Fintech Renamed' };
+    const updatedState = applicationsReducer(
+      state,
+      ApplicationsActions.applicationUpdated({ application: updated, previous: applied }),
+    );
+
+    const nextState = applicationsReducer(
+      updatedState,
+      ApplicationsActions.applicationUpdateFailed({ previous: applied, error: 'network error' }),
+    );
+
+    expect(applicationsAdapter.getSelectors().selectEntities(nextState)['1']?.company).toBe(
+      'Nordic Fintech',
+    );
+    expect(nextState.mutationError).toBe('network error');
+  });
+
   it('removes an application on delete and clears the last move', () => {
     const state = createState([applied, interview]);
 
     const nextState = applicationsReducer(
       state,
-      ApplicationsActions.applicationDeleted({ id: '1' }),
+      ApplicationsActions.applicationDeleted({ application: applied }),
     );
 
     expect(applicationsAdapter.getSelectors().selectEntities(nextState)['1']).toBeUndefined();
     expect(nextState.lastMove).toBeNull();
+  });
+
+  it('restores the application and sets a mutation error when persisting a delete fails', () => {
+    const state = createState([applied, interview]);
+    const deletedState = applicationsReducer(
+      state,
+      ApplicationsActions.applicationDeleted({ application: applied }),
+    );
+
+    const nextState = applicationsReducer(
+      deletedState,
+      ApplicationsActions.applicationDeleteFailed({ application: applied, error: 'network error' }),
+    );
+
+    expect(applicationsAdapter.getSelectors().selectEntities(nextState)['1']).toEqual(applied);
+    expect(nextState.mutationError).toBe('network error');
+  });
+
+  it('clears the mutation error', () => {
+    const state = { ...createState([applied]), mutationError: 'a previous failure' };
+
+    const nextState = applicationsReducer(state, ApplicationsActions.mutationErrorCleared());
+
+    expect(nextState.mutationError).toBeNull();
   });
 
   it('sets loading and clears any previous error when loading starts', () => {
