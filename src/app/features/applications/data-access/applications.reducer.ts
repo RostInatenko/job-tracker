@@ -1,7 +1,6 @@
 import { createReducer, on } from '@ngrx/store';
 import { createEntityAdapter, EntityState } from '@ngrx/entity';
 import { JobApplication, MovePayload } from './application.model';
-import { MOCK_APPLICATIONS } from './mock-applications';
 import { ApplicationsActions } from './applications.actions';
 import { groupByStatus } from './group-by-status';
 import { applyMove, invertMove } from './apply-move';
@@ -13,13 +12,17 @@ export interface LastMove extends MovePayload {
 
 export interface ApplicationsState extends EntityState<JobApplication> {
   lastMove: LastMove | null;
+  loading: boolean;
+  error: string | null;
 }
 
 export const applicationsAdapter = createEntityAdapter<JobApplication>();
 
 export const initialApplicationsState: ApplicationsState = {
-  ...applicationsAdapter.setAll(MOCK_APPLICATIONS, applicationsAdapter.getInitialState()),
+  ...applicationsAdapter.getInitialState(),
   lastMove: null,
+  loading: false,
+  error: null,
 };
 
 export const applicationsReducer = createReducer(
@@ -67,5 +70,19 @@ export const applicationsReducer = createReducer(
   on(ApplicationsActions.applicationDeleted, (state, { id }) => ({
     ...applicationsAdapter.removeOne(id, state),
     lastMove: null,
+  })),
+  on(ApplicationsActions.loadApplications, (state) => ({
+    ...state,
+    loading: true,
+    error: null,
+  })),
+  on(ApplicationsActions.loadApplicationsSuccess, (state, { applications }) => ({
+    ...applicationsAdapter.setAll(applications, state),
+    loading: false,
+  })),
+  on(ApplicationsActions.loadApplicationsFailure, (state, { error }) => ({
+    ...state,
+    loading: false,
+    error,
   })),
 );

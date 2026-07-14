@@ -18,3 +18,7 @@ export const selectLastMove = createSelector(
   selectApplicationsState,
   (state) => state.lastMove,
 );
+
+export const selectLoading = createSelector(selectApplicationsState, (state) => state.loading);
+
+export const selectError = createSelector(selectApplicationsState, (state) => state.error);

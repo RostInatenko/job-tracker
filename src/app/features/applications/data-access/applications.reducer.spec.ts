@@ -22,6 +22,8 @@ describe('applicationsReducer', () => {
     return {
       ...applicationsAdapter.setAll(applications, applicationsAdapter.getInitialState()),
       lastMove: null,
+      loading: false,
+      error: null,
     };
   }
 
@@ -154,5 +156,38 @@ describe('applicationsReducer', () => {
 
     expect(applicationsAdapter.getSelectors().selectEntities(nextState)['1']).toBeUndefined();
     expect(nextState.lastMove).toBeNull();
+  });
+
+  it('sets loading and clears any previous error when loading starts', () => {
+    const state = { ...createState([]), error: 'a previous failure' };
+
+    const nextState = applicationsReducer(state, ApplicationsActions.loadApplications());
+
+    expect(nextState.loading).toBe(true);
+    expect(nextState.error).toBeNull();
+  });
+
+  it('replaces the collection and clears loading on load success', () => {
+    const state = { ...createState([]), loading: true };
+
+    const nextState = applicationsReducer(
+      state,
+      ApplicationsActions.loadApplicationsSuccess({ applications: [applied, interview] }),
+    );
+
+    expect(nextState.loading).toBe(false);
+    expect(applicationsAdapter.getSelectors().selectAll(nextState)).toEqual([applied, interview]);
+  });
+
+  it('stores the error and clears loading on load failure', () => {
+    const state = { ...createState([]), loading: true };
+
+    const nextState = applicationsReducer(
+      state,
+      ApplicationsActions.loadApplicationsFailure({ error: 'network error' }),
+    );
+
+    expect(nextState.loading).toBe(false);
+    expect(nextState.error).toBe('network error');
   });
 });

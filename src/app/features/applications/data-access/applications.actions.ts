@@ -10,5 +10,8 @@ export const ApplicationsActions = createActionGroup({
     'Application Added': props<{ application: JobApplication }>(),
     'Application Updated': props<{ application: JobApplication }>(),
     'Application Deleted': props<{ id: string }>(),
+    'Load Applications': emptyProps(),
+    'Load Applications Success': props<{ applications: JobApplication[] }>(),
+    'Load Applications Failure': props<{ error: string }>(),
   },
 });
