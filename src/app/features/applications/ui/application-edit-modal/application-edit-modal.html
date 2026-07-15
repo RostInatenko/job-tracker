@@ -1,11 +1,20 @@
-<div (click)="close.emit()" class="fixed inset-0 flex items-center justify-center bg-black/40 p-4">
+<div
+  (click)="close.emit()"
+  (keydown.escape)="close.emit()"
+  class="fixed inset-0 flex items-center justify-center bg-black/40 p-4"
+>
   <form
+    cdkTrapFocus
+    cdkTrapFocusAutoCapture
     [formGroup]="form"
     (ngSubmit)="onSave()"
     (click)="$event.stopPropagation()"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="edit-modal-heading"
     class="w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
   >
-    <h2 class="mb-4 text-lg font-semibold text-slate-900">Edit application</h2>
+    <h2 id="edit-modal-heading" class="mb-4 text-lg font-semibold text-slate-900">Edit application</h2>
 
     <label class="mb-3 block text-sm">
       <span class="mb-1 block font-medium text-slate-700">Company</span>

@@ -32,6 +32,7 @@ export class BoardPage {
   protected readonly error = this.store.selectSignal(selectError);
   protected readonly mutationError = this.store.selectSignal(selectMutationError);
   protected readonly editingApplication = signal<JobApplication | null>(null);
+  private editTriggerElement: HTMLElement | null = null;
 
   protected readonly undoMessage = computed(() => {
     const move = this.lastMove();
@@ -118,11 +119,12 @@ export class BoardPage {
   }
 
   protected onEdit(application: JobApplication): void {
+    this.editTriggerElement = document.activeElement as HTMLElement;
     this.editingApplication.set(application);
   }
 
   protected onCloseEdit(): void {
-    this.editingApplication.set(null);
+    this.closeEdit();
   }
 
   protected onSaveEdit(application: JobApplication): void {
@@ -133,7 +135,7 @@ export class BoardPage {
     }
 
     this.store.dispatch(ApplicationsActions.applicationUpdated({ application, previous }));
-    this.editingApplication.set(null);
+    this.closeEdit();
   }
 
   protected onDeleteEdit(): void {
@@ -144,6 +146,12 @@ export class BoardPage {
     }
 
     this.store.dispatch(ApplicationsActions.applicationDeleted({ application }));
+    this.closeEdit();
+  }
+
+  private closeEdit(): void {
     this.editingApplication.set(null);
+    this.editTriggerElement?.focus();
+    this.editTriggerElement = null;
   }
 }

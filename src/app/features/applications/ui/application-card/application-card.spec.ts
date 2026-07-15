@@ -54,6 +54,19 @@ describe('ApplicationCard', () => {
     expect(emitted).toEqual(mockApplication);
   });
 
+  it('emits edit exactly once when the Edit button is activated', () => {
+    const fixture = createComponent();
+    let emitCount = 0;
+    fixture.componentInstance.edit.subscribe(() => emitCount++);
+
+    const editButton = Array.from(
+      (fixture.nativeElement as HTMLElement).querySelectorAll('button'),
+    ).find((button) => button.textContent?.trim() === 'Edit');
+    editButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(emitCount).toBe(1);
+  });
+
   it('does not emit edit when the posting link is clicked', () => {
     const withLink: JobApplication = { ...mockApplication, link: 'https://example.com/job' };
     const fixture = TestBed.createComponent(ApplicationCard);

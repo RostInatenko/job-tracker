@@ -10,4 +10,9 @@ import { JobApplication } from '../../data-access/application.model';
 export class ApplicationCard {
   application = input.required<JobApplication>();
   edit = output<JobApplication>();
+
+  protected onEditClick(event: Event): void {
+    event.stopPropagation();
+    this.edit.emit(this.application());
+  }
 }

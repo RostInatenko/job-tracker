@@ -1,10 +1,11 @@
 import { Component, inject, input, OnInit, output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CdkTrapFocus } from '@angular/cdk/a11y';
 import { ApplicationStatus, BOARD_COLUMNS, JobApplication } from '../../data-access/application.model';
 
 @Component({
   selector: 'app-application-edit-modal',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, CdkTrapFocus],
   templateUrl: './application-edit-modal.html',
 })
 export class ApplicationEditModal implements OnInit {
