@@ -15,7 +15,16 @@
     class="flex min-h-16 flex-col gap-2"
   >
     @for (application of applications(); track application.id) {
-      <app-application-card cdkDrag [application]="application" (edit)="edit.emit($event)" />
+      <app-application-card
+        cdkDrag
+        tabindex="0"
+        [application]="application"
+        (edit)="edit.emit($event)"
+      />
+    } @empty {
+      <p class="rounded-md border border-dashed border-slate-300 p-3 text-center text-xs text-slate-400">
+        No applications here yet
+      </p>
     }
   </div>
 </div>
