@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { from, map, Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { map, Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { JobApplication } from './application.model';
 
@@ -9,7 +9,7 @@ interface ApplicationRow {
   company: string;
   role: string;
   status: string;
-  date_applied: string;
+  dateApplied: string;
   notes: string | null;
   link: string | null;
 }
@@ -19,20 +19,31 @@ function toApplication(row: ApplicationRow): JobApplication {
     id: row.id,
     company: row.company,
     role: row.role,
-    status: row.status as JobApplication['status'],
-    dateApplied: row.date_applied,
+    status: row.status.toLowerCase() as JobApplication['status'],
+    dateApplied: row.dateApplied.slice(0, 10),
     notes: row.notes ?? undefined,
     link: row.link ?? undefined,
   };
 }
 
-function toRow(application: JobApplication): ApplicationRow {
+function toCreateBody(application: JobApplication) {
   return {
     id: application.id,
     company: application.company,
     role: application.role,
-    status: application.status,
-    date_applied: application.dateApplied,
+    status: application.status.toUpperCase(),
+    dateApplied: application.dateApplied,
+    notes: application.notes ?? null,
+    link: application.link ?? null,
+  };
+}
+
+function toUpdateBody(application: JobApplication) {
+  return {
+    company: application.company,
+    role: application.role,
+    status: application.status.toUpperCase(),
+    dateApplied: application.dateApplied,
     notes: application.notes ?? null,
     link: application.link ?? null,
   };
@@ -40,52 +51,24 @@ function toRow(application: JobApplication): ApplicationRow {
 
 @Injectable({ providedIn: 'root' })
 export class ApplicationsService {
-  private readonly client: SupabaseClient = createClient(
-    environment.supabaseUrl,
-    environment.supabaseAnonKey,
-  );
+  private readonly http = inject(HttpClient);
+  private readonly baseUrl = `${environment.apiUrl}/applications`;
 
   getAll(): Observable<JobApplication[]> {
-    return from(this.client.from('applications').select('*').order('created_at')).pipe(
-      map(({ data, error }) => {
-        if (error) {
-          throw error;
-        }
-
-        return (data as ApplicationRow[]).map(toApplication);
-      }),
-    );
+    return this.http
+      .get<ApplicationRow[]>(this.baseUrl)
+      .pipe(map((rows) => rows.map(toApplication)));
   }
 
   add(application: JobApplication): Observable<void> {
-    return from(this.client.from('applications').insert(toRow(application))).pipe(
-      map(({ error }) => {
-        if (error) {
-          throw error;
-        }
-      }),
-    );
+    return this.http.post<void>(this.baseUrl, toCreateBody(application));
   }
 
   update(application: JobApplication): Observable<void> {
-    return from(
-      this.client.from('applications').update(toRow(application)).eq('id', application.id),
-    ).pipe(
-      map(({ error }) => {
-        if (error) {
-          throw error;
-        }
-      }),
-    );
+    return this.http.patch<void>(`${this.baseUrl}/${application.id}`, toUpdateBody(application));
   }
 
   delete(id: string): Observable<void> {
-    return from(this.client.from('applications').delete().eq('id', id)).pipe(
-      map(({ error }) => {
-        if (error) {
-          throw error;
-        }
-      }),
-    );
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 }
