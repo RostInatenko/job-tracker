@@ -1,0 +1,47 @@
+<div class="flex h-full items-center justify-center">
+  <form
+    (ngSubmit)="onSubmit()"
+    class="w-full max-w-sm rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
+  >
+    <h1 class="mb-4 text-lg font-semibold text-slate-900">Register</h1>
+
+    <label class="mb-3 block text-sm">
+      <span class="mb-1 block font-medium text-slate-700">Email</span>
+      <input
+        type="email"
+        name="email"
+        [(ngModel)]="email"
+        required
+        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+      />
+    </label>
+
+    <label class="mb-4 block text-sm">
+      <span class="mb-1 block font-medium text-slate-700">Password</span>
+      <input
+        type="password"
+        name="password"
+        [(ngModel)]="password"
+        required
+        minlength="8"
+        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+      />
+    </label>
+
+    @if (error()) {
+      <p class="mb-4 text-sm text-red-600">{{ error() }}</p>
+    }
+
+    <button
+      type="submit"
+      [disabled]="loading()"
+      class="w-full rounded-md bg-slate-900 px-4 py-2 text-sm text-white hover:bg-slate-800 disabled:opacity-50"
+    >
+      {{ loading() ? 'Registering...' : 'Register' }}
+    </button>
+
+    <p class="mt-4 text-center text-sm text-slate-600">
+      Already have an account? <a routerLink="/login" class="text-slate-900 underline">Log in</a>
+    </p>
+  </form>
+</div>
