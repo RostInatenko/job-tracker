@@ -1,4 +1,4 @@
-import { Component, inject, input, OnInit, output } from '@angular/core';
+import { Component, inject, input, OnInit, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CdkTrapFocus } from '@angular/cdk/a11y';
 import { ApplicationStatus, BOARD_COLUMNS, JobApplication } from '../../data-access/application.model';
@@ -17,6 +17,7 @@ export class ApplicationEditModal implements OnInit {
   close = output<void>();
 
   protected readonly columns = BOARD_COLUMNS;
+  protected readonly confirmingDelete = signal(false);
 
   protected readonly form = this.formBuilder.nonNullable.group({
     company: ['', Validators.required],
@@ -52,7 +53,15 @@ export class ApplicationEditModal implements OnInit {
     });
   }
 
-  protected onDelete(): void {
+  protected onDeleteClick(): void {
+    this.confirmingDelete.set(true);
+  }
+
+  protected onDeleteCancel(): void {
+    this.confirmingDelete.set(false);
+  }
+
+  protected onDeleteConfirm(): void {
     this.delete.emit();
   }
 }

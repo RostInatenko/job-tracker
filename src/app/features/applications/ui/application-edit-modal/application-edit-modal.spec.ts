@@ -63,14 +63,38 @@ describe('ApplicationEditModal', () => {
     expect(emitted).toBe(false);
   });
 
-  it('emits delete when the delete button is clicked', () => {
+  it('does not emit delete on the first click, only after confirming', () => {
     const fixture = createComponent();
     let emitted = false;
     fixture.componentInstance.delete.subscribe(() => (emitted = true));
 
-    fixture.componentInstance['onDelete']();
+    fixture.componentInstance['onDeleteClick']();
+
+    expect(emitted).toBe(false);
+    expect(fixture.componentInstance['confirmingDelete']()).toBe(true);
+  });
+
+  it('emits delete once the confirm step is completed', () => {
+    const fixture = createComponent();
+    let emitted = false;
+    fixture.componentInstance.delete.subscribe(() => (emitted = true));
+
+    fixture.componentInstance['onDeleteClick']();
+    fixture.componentInstance['onDeleteConfirm']();
 
     expect(emitted).toBe(true);
+  });
+
+  it('cancelling the confirm step resets it without emitting delete', () => {
+    const fixture = createComponent();
+    let emitted = false;
+    fixture.componentInstance.delete.subscribe(() => (emitted = true));
+
+    fixture.componentInstance['onDeleteClick']();
+    fixture.componentInstance['onDeleteCancel']();
+
+    expect(emitted).toBe(false);
+    expect(fixture.componentInstance['confirmingDelete']()).toBe(false);
   });
 
   it('emits close when the backdrop is clicked', () => {
