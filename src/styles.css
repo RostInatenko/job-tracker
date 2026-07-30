@@ -1,3 +1,108 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-page: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-sunken: #f1f5f9;
+  --color-border: #e2e8f0;
+  --color-border-strong: #cbd5e1;
+  --color-ink: #0f172a;
+  --color-ink-soft: #475569;
+  --color-ink-faint: #94a3b8;
+  --color-link: #2563eb;
+  --color-link-bg: #eff6ff;
+  --color-money: #047857;
+  --color-stage: #7c3aed;
+  --color-stage-bg: #f3e8ff;
+  --color-warn: #b45309;
+  --color-warn-bg: #fffbeb;
+  --color-warn-border: #fde68a;
+  --color-danger: #dc2626;
+  --color-danger-bg: #fef2f2;
+  --color-btn-bg: #0f172a;
+  --color-btn-text: #ffffff;
+}
+
+.dark {
+  --color-page: #121319;
+  --color-surface: #1b1d25;
+  --color-surface-sunken: #23252f;
+  --color-border: #2c2e39;
+  --color-border-strong: #3a3d4a;
+  --color-ink: #e9eaed;
+  --color-ink-soft: #a6a9b4;
+  --color-ink-faint: #6c6f7c;
+  --color-link: #7aa8f7;
+  --color-link-bg: #1d2a44;
+  --color-money: #4ade9b;
+  --color-stage: #b79dfb;
+  --color-stage-bg: #2c2447;
+  --color-warn: #f5b94f;
+  --color-warn-bg: #302410;
+  --color-warn-border: #4a3a17;
+  --color-danger: #f38080;
+  --color-danger-bg: #3a1f1f;
+  --color-btn-bg: #e9eaed;
+  --color-btn-text: #17181d;
+}
+
+html {
+  background: var(--color-page);
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+select {
+  appearance: none;
+  background-repeat: no-repeat;
+  background-position: right 0.65rem center;
+  background-size: 14px;
+  padding-right: 2.25rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+.dark select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23a6a9b4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+input[type='date']::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.6;
+  padding: 0;
+  margin-left: 4px;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+*:hover {
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 999px;
+  transition: background-color 0.15s ease;
+}
+
+*:hover::-webkit-scrollbar-thumb {
+  background-color: var(--color-border-strong);
+}

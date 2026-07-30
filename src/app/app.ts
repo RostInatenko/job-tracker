@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { AuthService } from './core/auth/auth.service';
 import { AuthTokenService } from './core/auth/auth-token.service';
+import { ThemeService } from './core/theme/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -13,6 +14,7 @@ export class App {
   private readonly authService = inject(AuthService);
   private readonly authToken = inject(AuthTokenService);
   private readonly router = inject(Router);
+  protected readonly themeService = inject(ThemeService);
 
   protected readonly isLoggedIn = this.authToken.accessToken;
 

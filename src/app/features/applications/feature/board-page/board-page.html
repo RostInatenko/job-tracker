@@ -3,14 +3,14 @@
   <button
     type="button"
     (click)="onOpenPastePosting()"
-    class="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+    class="rounded-md border border-border-strong px-3 py-2 text-sm font-medium text-ink-soft hover:bg-surface-sunken"
   >
     Add from job posting
   </button>
 </div>
 
 @if (mutationError(); as message) {
-  <div class="mb-4 flex items-center gap-3 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+  <div class="mb-4 flex items-center gap-3 rounded-md border border-danger/30 bg-danger-bg px-4 py-3 text-sm text-danger">
     <span>{{ message }}</span>
     <button type="button" (click)="onDismissMutationError()" class="font-medium underline hover:no-underline">
       Dismiss
@@ -19,9 +19,9 @@
 }
 
 @if (loading()) {
-  <p class="text-sm text-slate-500">Loading your applications…</p>
+  <p class="text-sm text-ink-soft">Loading your applications…</p>
 } @else if (error(); as message) {
-  <div class="flex items-center gap-3 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+  <div class="flex items-center gap-3 rounded-md border border-danger/30 bg-danger-bg px-4 py-3 text-sm text-danger">
     <span>{{ message }}</span>
     <button type="button" (click)="onRetryLoad()" class="font-medium underline hover:no-underline">
       Retry
