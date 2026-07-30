@@ -1,7 +1,12 @@
-import { Component, inject, input, OnInit, output, signal } from '@angular/core';
+import { Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CdkTrapFocus } from '@angular/cdk/a11y';
-import { ApplicationStatus, BOARD_COLUMNS, JobApplication } from '../../data-access/application.model';
+import {
+  ApplicationStatus,
+  BOARD_COLUMNS,
+  InterviewStage,
+  JobApplication,
+} from '../../data-access/application.model';
 
 @Component({
   selector: 'app-application-edit-modal',
@@ -33,11 +38,16 @@ export class ApplicationEditModal implements OnInit {
   });
 
   protected readonly techStackTags = signal<string[]>([]);
+  protected readonly interviewStages = signal<InterviewStage[]>([]);
+  protected readonly sortedInterviewStages = computed(() =>
+    [...this.interviewStages()].sort((a, b) => a.date.localeCompare(b.date)),
+  );
 
   ngOnInit(): void {
     const application = this.application();
     this.form.patchValue(application);
     this.techStackTags.set(application.techStack ?? []);
+    this.interviewStages.set(application.interviewStages ?? []);
   }
 
   protected onTechInput(input: HTMLInputElement): void {
@@ -68,6 +78,21 @@ export class ApplicationEditModal implements OnInit {
     this.techStackTags.update((tags) => [...tags, trimmed]);
   }
 
+  protected onAddStage(stageInput: HTMLInputElement, dateInput: HTMLInputElement): void {
+    const stage = stageInput.value.trim();
+    const date = dateInput.value;
+    if (!stage || !date) {
+      return;
+    }
+    this.interviewStages.update((stages) => [...stages, { stage, date }]);
+    stageInput.value = '';
+    dateInput.value = '';
+  }
+
+  protected onRemoveStage(entry: InterviewStage): void {
+    this.interviewStages.update((stages) => stages.filter((existing) => existing !== entry));
+  }
+
   protected onSave(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -85,6 +110,7 @@ export class ApplicationEditModal implements OnInit {
       link: value.link || undefined,
       salary: value.salary || undefined,
       techStack: this.techStackTags(),
+      interviewStages: this.interviewStages(),
     });
   }
 

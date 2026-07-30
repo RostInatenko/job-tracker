@@ -12,31 +12,32 @@
     role="dialog"
     aria-modal="true"
     aria-labelledby="edit-modal-heading"
-    class="w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
+    class="flex max-h-[85vh] w-full max-w-md flex-col rounded-lg border border-border bg-surface"
   >
-    <h2 id="edit-modal-heading" class="mb-4 text-lg font-semibold text-slate-900">Edit application</h2>
+  <div class="overflow-y-auto p-6">
+    <h2 id="edit-modal-heading" class="mb-4 text-lg font-semibold text-ink">Edit application</h2>
 
     <label class="mb-3 block text-sm">
-      <span class="mb-1 block font-medium text-slate-700">Company</span>
+      <span class="mb-1 block font-medium text-ink">Company</span>
       <input
         formControlName="company"
-        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+        class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
       />
     </label>
 
     <label class="mb-3 block text-sm">
-      <span class="mb-1 block font-medium text-slate-700">Role</span>
+      <span class="mb-1 block font-medium text-ink">Role</span>
       <input
         formControlName="role"
-        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+        class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
       />
     </label>
 
     <label class="mb-3 block text-sm">
-      <span class="mb-1 block font-medium text-slate-700">Status</span>
+      <span class="mb-1 block font-medium text-ink">Status</span>
       <select
         formControlName="status"
-        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+        class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
       >
         @for (column of columns; track column.status) {
           <option [value]="column.status">{{ column.label }}</option>
@@ -45,25 +46,25 @@
     </label>
 
     <label class="mb-3 block text-sm">
-      <span class="mb-1 block font-medium text-slate-700">Date applied</span>
+      <span class="mb-1 block font-medium text-ink">Date applied</span>
       <input
         type="date"
         formControlName="dateApplied"
-        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+        class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
       />
     </label>
 
     <label class="mb-3 block text-sm">
-      <span class="mb-1 block font-medium text-slate-700">Tech stack</span>
-      <div class="flex w-full flex-wrap items-center gap-1 rounded-md border border-slate-300 px-2 py-1.5">
+      <span class="mb-1 block font-medium text-ink">Tech stack</span>
+      <div class="flex w-full flex-wrap items-center gap-1 rounded-md border border-border-strong bg-surface px-2 py-1.5">
         @for (tech of techStackTags(); track tech) {
-          <span class="flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
+          <span class="flex items-center gap-1 rounded-full bg-surface-sunken px-2 py-0.5 text-xs text-ink-soft">
             {{ tech }}
             <button
               type="button"
               (click)="onRemoveTech(tech)"
               aria-label="Remove {{ tech }}"
-              class="text-slate-400 hover:text-slate-700"
+              class="text-ink-faint hover:text-ink"
             >
               &times;
             </button>
@@ -75,51 +76,94 @@
           (input)="onTechInput(techInput)"
           (keydown.enter)="onTechInputEnter(techInput); $event.preventDefault()"
           placeholder="Type a skill, Enter or comma to add"
-          class="min-w-32 flex-1 border-0 p-1 text-sm outline-none"
+          class="min-w-32 flex-1 border-0 bg-transparent p-1 text-sm text-ink outline-none"
         />
       </div>
     </label>
 
     <label class="mb-3 block text-sm">
-      <span class="mb-1 block font-medium text-slate-700">Salary</span>
+      <span class="mb-1 block font-medium text-ink">Salary</span>
       <input
         formControlName="salary"
-        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+        class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
       />
     </label>
 
+    <div class="mb-3 block text-sm">
+      <span class="mb-1 block font-medium text-ink">Interview timeline</span>
+      <div class="rounded-md border border-border-strong bg-surface p-2">
+        @for (entry of sortedInterviewStages(); track entry) {
+          <div class="flex items-center gap-2 border-b border-border py-1.5 last:border-b-0">
+            <span class="h-2 w-2 shrink-0 rounded-full bg-stage"></span>
+            <span class="flex-1 text-sm text-ink">{{ entry.stage }}</span>
+            <span class="text-xs text-ink-soft">{{ entry.date }}</span>
+            <button
+              type="button"
+              (click)="onRemoveStage(entry)"
+              class="text-xs text-ink-faint hover:text-ink"
+            >
+              Remove
+            </button>
+          </div>
+        } @empty {
+          <p class="py-1 text-xs text-ink-faint">No interview stages logged yet.</p>
+        }
+        <div class="mt-2 flex items-center gap-2">
+          <input
+            #stageInput
+            type="text"
+            placeholder="Stage, e.g. HR screen"
+            class="min-w-0 flex-1 rounded-md border border-border-strong bg-surface px-2 py-1.5 text-xs text-ink"
+          />
+          <input
+            #dateInput
+            type="date"
+            class="rounded-md border border-border-strong bg-surface px-2 py-1.5 text-xs text-ink"
+          />
+          <button
+            type="button"
+            (click)="onAddStage(stageInput, dateInput)"
+            class="shrink-0 rounded-md border border-border-strong px-2 py-1.5 text-xs font-medium text-ink-soft hover:bg-surface-sunken"
+          >
+            Add
+          </button>
+        </div>
+      </div>
+    </div>
+
     <label class="mb-3 block text-sm">
-      <span class="mb-1 block font-medium text-slate-700">Notes</span>
+      <span class="mb-1 block font-medium text-ink">Notes</span>
       <textarea
         formControlName="notes"
         rows="3"
-        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+        class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
       ></textarea>
     </label>
 
-    <label class="mb-4 block text-sm">
-      <span class="mb-1 block font-medium text-slate-700">Job link</span>
+    <label class="mb-0 block text-sm">
+      <span class="mb-1 block font-medium text-ink">Job link</span>
       <input
         formControlName="link"
-        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+        class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
       />
     </label>
+  </div>
 
-    <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between border-t border-border p-6 pt-4">
       @if (confirmingDelete()) {
         <div class="flex items-center gap-2 text-sm">
-          <span class="text-slate-700">Delete this application?</span>
+          <span class="text-ink">Delete this application?</span>
           <button
             type="button"
             (click)="onDeleteConfirm()"
-            class="rounded-md bg-red-600 px-3 py-1.5 font-medium text-white hover:bg-red-700"
+            class="rounded-md bg-danger px-3 py-1.5 font-medium text-white hover:opacity-90"
           >
             Confirm
           </button>
           <button
             type="button"
             (click)="onDeleteCancel()"
-            class="rounded-md px-3 py-1.5 text-slate-600 hover:bg-slate-100"
+            class="rounded-md px-3 py-1.5 text-ink-soft hover:bg-surface-sunken"
           >
             Cancel
           </button>
@@ -128,7 +172,7 @@
         <button
           type="button"
           (click)="onDeleteClick()"
-          class="rounded-md px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700"
+          class="rounded-md px-3 py-2 text-sm font-medium text-danger hover:bg-danger-bg"
         >
           Delete
         </button>
@@ -137,13 +181,13 @@
         <button
           type="button"
           (click)="close.emit()"
-          class="rounded-md px-3 py-2 text-sm text-slate-600 hover:bg-slate-100"
+          class="rounded-md px-3 py-2 text-sm text-ink-soft hover:bg-surface-sunken"
         >
           Cancel
         </button>
         <button
           type="submit"
-          class="rounded-md bg-slate-900 px-3 py-2 text-sm text-white hover:bg-slate-800"
+          class="rounded-md bg-btn-bg px-3 py-2 text-sm text-btn-text hover:opacity-90"
         >
           Save
         </button>

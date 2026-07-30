@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { JobApplication } from './application.model';
+import { InterviewStage, JobApplication } from './application.model';
 
 interface ApplicationRow {
   id: string;
@@ -14,6 +14,7 @@ interface ApplicationRow {
   link: string | null;
   techStack: string[];
   salary: string | null;
+  interviewStages: InterviewStage[];
 }
 
 function toApplication(row: ApplicationRow): JobApplication {
@@ -27,6 +28,7 @@ function toApplication(row: ApplicationRow): JobApplication {
     link: row.link ?? undefined,
     techStack: row.techStack,
     salary: row.salary ?? undefined,
+    interviewStages: row.interviewStages,
   };
 }
 
@@ -41,6 +43,7 @@ function toCreateBody(application: JobApplication) {
     link: application.link ?? null,
     techStack: application.techStack ?? [],
     salary: application.salary ?? null,
+    interviewStages: application.interviewStages ?? [],
   };
 }
 
@@ -54,6 +57,7 @@ function toUpdateBody(application: JobApplication) {
     link: application.link ?? null,
     techStack: application.techStack ?? [],
     salary: application.salary ?? null,
+    interviewStages: application.interviewStages ?? [],
   };
 }
 

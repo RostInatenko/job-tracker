@@ -1,5 +1,10 @@
 export type ApplicationStatus = 'applied' | 'interview' | 'offer' | 'rejected';
 
+export interface InterviewStage {
+  stage: string;
+  date: string;
+}
+
 export interface JobApplication {
   id: string;
   company: string;
@@ -10,6 +15,7 @@ export interface JobApplication {
   link?: string;
   techStack?: string[];
   salary?: string;
+  interviewStages?: InterviewStage[];
 }
 
 export interface BoardColumnConfig {

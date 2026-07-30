@@ -10,141 +10,159 @@
     role="dialog"
     aria-modal="true"
     aria-labelledby="paste-posting-heading"
-    class="w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
+    class="flex max-h-[85vh] w-full max-w-md flex-col overflow-hidden rounded-lg border border-border bg-surface"
   >
-    <h2 id="paste-posting-heading" class="mb-4 text-lg font-semibold text-slate-900">
-      Add from job posting
-    </h2>
-
     @switch (phase()) {
       @case ('paste') {
-        <label class="mb-3 block text-sm">
-          <span class="mb-1 block font-medium text-slate-700">Paste the job posting text</span>
-          <textarea
-            [(ngModel)]="jobPostingText"
-            rows="8"
-            class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-          ></textarea>
-        </label>
+        <div class="p-6">
+          <h2 id="paste-posting-heading" class="mb-4 text-lg font-semibold text-ink">
+            Add from job posting
+          </h2>
 
-        <div class="flex items-center justify-between">
-          <button
-            type="button"
-            (click)="onSkipToManual()"
-            class="rounded-md px-3 py-2 text-sm text-slate-600 hover:bg-slate-100"
-          >
-            Fill in manually instead
-          </button>
-          <button
-            type="button"
-            (click)="onExtract()"
-            class="rounded-md bg-slate-900 px-3 py-2 text-sm text-white hover:bg-slate-800"
-          >
-            Extract details
-          </button>
+          <label class="mb-3 block text-sm">
+            <span class="mb-1 block font-medium text-ink">Paste the job posting text</span>
+            <textarea
+              [(ngModel)]="jobPostingText"
+              rows="8"
+              class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
+            ></textarea>
+          </label>
+
+          <div class="flex items-center justify-between">
+            <button
+              type="button"
+              (click)="onSkipToManual()"
+              class="rounded-md px-3 py-2 text-sm text-ink-soft hover:bg-surface-sunken"
+            >
+              Fill in manually instead
+            </button>
+            <button
+              type="button"
+              (click)="onExtract()"
+              class="rounded-md bg-btn-bg px-3 py-2 text-sm text-btn-text hover:opacity-90"
+            >
+              Extract details
+            </button>
+          </div>
         </div>
       }
 
       @case ('loading') {
-        <p class="py-8 text-center text-sm text-slate-600">Reading the posting…</p>
+        <div class="p-6">
+          <h2 id="paste-posting-heading" class="mb-4 text-lg font-semibold text-ink">
+            Add from job posting
+          </h2>
+          <p class="py-8 text-center text-sm text-ink-soft">Reading the posting…</p>
+        </div>
       }
 
       @case ('error') {
-        <p class="mb-4 text-sm text-red-600">{{ errorMessage() }}</p>
-        <div class="flex justify-end gap-2">
-          <button
-            type="button"
-            (click)="phase.set('paste')"
-            class="rounded-md px-3 py-2 text-sm text-slate-600 hover:bg-slate-100"
-          >
-            Try again
-          </button>
-          <button
-            type="button"
-            (click)="onSkipToManual()"
-            class="rounded-md bg-slate-900 px-3 py-2 text-sm text-white hover:bg-slate-800"
-          >
-            Fill in manually
-          </button>
+        <div class="p-6">
+          <h2 id="paste-posting-heading" class="mb-4 text-lg font-semibold text-ink">
+            Add from job posting
+          </h2>
+          <p class="mb-4 text-sm text-danger">{{ errorMessage() }}</p>
+          <div class="flex justify-end gap-2">
+            <button
+              type="button"
+              (click)="phase.set('paste')"
+              class="rounded-md px-3 py-2 text-sm text-ink-soft hover:bg-surface-sunken"
+            >
+              Try again
+            </button>
+            <button
+              type="button"
+              (click)="onSkipToManual()"
+              class="rounded-md bg-btn-bg px-3 py-2 text-sm text-btn-text hover:opacity-90"
+            >
+              Fill in manually
+            </button>
+          </div>
         </div>
       }
 
       @case ('review') {
-        <form [formGroup]="form" (ngSubmit)="onSave()">
-          <label class="mb-3 block text-sm">
-            <span class="mb-1 block font-medium text-slate-700">Company</span>
-            <input
-              formControlName="company"
-              class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-            />
-          </label>
+        <form [formGroup]="form" (ngSubmit)="onSave()" class="flex min-h-0 flex-col">
+          <div class="overflow-y-auto p-6">
+            <h2 id="paste-posting-heading" class="mb-4 text-lg font-semibold text-ink">
+              Add from job posting
+            </h2>
 
-          <label class="mb-3 block text-sm">
-            <span class="mb-1 block font-medium text-slate-700">Role</span>
-            <input
-              formControlName="role"
-              class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-            />
-          </label>
+            <label class="mb-3 block text-sm">
+              <span class="mb-1 block font-medium text-ink">Company</span>
+              <input
+                formControlName="company"
+                class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
+              />
+            </label>
 
-          <label class="mb-3 block text-sm">
-            <span class="mb-1 block font-medium text-slate-700">Status</span>
-            <select
-              formControlName="status"
-              class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-            >
-              @for (column of columns; track column.status) {
-                <option [value]="column.status">{{ column.label }}</option>
-              }
-            </select>
-          </label>
+            <label class="mb-3 block text-sm">
+              <span class="mb-1 block font-medium text-ink">Role</span>
+              <input
+                formControlName="role"
+                class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
+              />
+            </label>
 
-          <label class="mb-3 block text-sm">
-            <span class="mb-1 block font-medium text-slate-700">Date applied</span>
-            <input
-              type="date"
-              formControlName="dateApplied"
-              class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-            />
-          </label>
+            <label class="mb-3 block text-sm">
+              <span class="mb-1 block font-medium text-ink">Status</span>
+              <select
+                formControlName="status"
+                class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
+              >
+                @for (column of columns; track column.status) {
+                  <option [value]="column.status">{{ column.label }}</option>
+                }
+              </select>
+            </label>
 
-          <label class="mb-3 block text-sm">
-            <span class="mb-1 block font-medium text-slate-700">Tech stack</span>
-            <input
-              formControlName="techStack"
-              placeholder="Comma-separated, e.g. Node.js, TypeScript, Postgres"
-              class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-            />
-          </label>
+            <label class="mb-3 block text-sm">
+              <span class="mb-1 block font-medium text-ink">Date applied</span>
+              <input
+                type="date"
+                formControlName="dateApplied"
+                class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
+              />
+            </label>
 
-          <label class="mb-3 block text-sm">
-            <span class="mb-1 block font-medium text-slate-700">Salary</span>
-            <input
-              formControlName="salary"
-              class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-            />
-          </label>
+            <label class="mb-3 block text-sm">
+              <span class="mb-1 block font-medium text-ink">Tech stack</span>
+              <input
+                formControlName="techStack"
+                placeholder="Comma-separated, e.g. Node.js, TypeScript, Postgres"
+                class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
+              />
+            </label>
 
-          <label class="mb-4 block text-sm">
-            <span class="mb-1 block font-medium text-slate-700">Notes</span>
-            <textarea
-              formControlName="notes"
-              rows="2"
-              class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-            ></textarea>
-          </label>
+            <label class="mb-0 block text-sm">
+              <span class="mb-1 block font-medium text-ink">Salary</span>
+              <input
+                formControlName="salary"
+                class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
+              />
+            </label>
 
-          <div class="flex justify-end gap-2">
+            <label class="mb-0 mt-3 block text-sm">
+              <span class="mb-1 block font-medium text-ink">Notes</span>
+              <textarea
+                formControlName="notes"
+                rows="2"
+                class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
+              ></textarea>
+            </label>
+          </div>
+
+          <div class="flex justify-end gap-2 border-t border-border p-6 pt-4">
             <button
               type="button"
               (click)="close.emit()"
-              class="rounded-md px-3 py-2 text-sm text-slate-600 hover:bg-slate-100"
+              class="rounded-md px-3 py-2 text-sm text-ink-soft hover:bg-surface-sunken"
             >
               Cancel
             </button>
             <button
               type="submit"
-              class="rounded-md bg-slate-900 px-3 py-2 text-sm text-white hover:bg-slate-800"
+              class="rounded-md bg-btn-bg px-3 py-2 text-sm text-btn-text hover:opacity-90"
             >
               Add application
             </button>
