@@ -36,7 +36,9 @@ export class AuthService {
       .pipe(tap((res) => this.authToken.setAccessToken(res.accessToken)));
   }
 
-  logout(): void {
-    this.authToken.setAccessToken(null);
+  logout(): Observable<void> {
+    return this.http
+      .post<void>(`${environment.apiUrl}/auth/logout`, {}, { withCredentials: true })
+      .pipe(tap(() => this.authToken.setAccessToken(null)));
   }
 }
