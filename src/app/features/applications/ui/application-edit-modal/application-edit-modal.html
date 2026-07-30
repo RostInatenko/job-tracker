@@ -54,6 +54,41 @@
     </label>
 
     <label class="mb-3 block text-sm">
+      <span class="mb-1 block font-medium text-slate-700">Tech stack</span>
+      <div class="flex w-full flex-wrap items-center gap-1 rounded-md border border-slate-300 px-2 py-1.5">
+        @for (tech of techStackTags(); track tech) {
+          <span class="flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
+            {{ tech }}
+            <button
+              type="button"
+              (click)="onRemoveTech(tech)"
+              aria-label="Remove {{ tech }}"
+              class="text-slate-400 hover:text-slate-700"
+            >
+              &times;
+            </button>
+          </span>
+        }
+        <input
+          #techInput
+          type="text"
+          (input)="onTechInput(techInput)"
+          (keydown.enter)="onTechInputEnter(techInput); $event.preventDefault()"
+          placeholder="Type a skill, Enter or comma to add"
+          class="min-w-32 flex-1 border-0 p-1 text-sm outline-none"
+        />
+      </div>
+    </label>
+
+    <label class="mb-3 block text-sm">
+      <span class="mb-1 block font-medium text-slate-700">Salary</span>
+      <input
+        formControlName="salary"
+        class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+      />
+    </label>
+
+    <label class="mb-3 block text-sm">
       <span class="mb-1 block font-medium text-slate-700">Notes</span>
       <textarea
         formControlName="notes"

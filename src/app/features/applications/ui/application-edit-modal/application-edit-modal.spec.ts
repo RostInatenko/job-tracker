@@ -11,6 +11,8 @@ describe('ApplicationEditModal', () => {
     dateApplied: '2026-06-28',
     notes: 'Referred by a friend',
     link: 'https://example.com/jobs/nordic-fintech',
+    techStack: ['Angular', 'RxJS'],
+    salary: '$90,000 - $110,000',
   };
 
   beforeEach(async () => {
@@ -35,9 +37,24 @@ describe('ApplicationEditModal', () => {
       role: 'Angular Developer',
       status: 'applied',
       dateApplied: '2026-06-28',
+      salary: '$90,000 - $110,000',
       notes: 'Referred by a friend',
       link: 'https://example.com/jobs/nordic-fintech',
     });
+    expect(fixture.componentInstance['techStackTags']()).toEqual(['Angular', 'RxJS']);
+  });
+
+  it('adds and removes tech stack tags', () => {
+    const fixture = createComponent();
+    const component = fixture.componentInstance;
+
+    component['onRemoveTech']('RxJS');
+    expect(component['techStackTags']()).toEqual(['Angular']);
+
+    const fakeInput = { value: 'NgRx' } as HTMLInputElement;
+    component['onTechInputEnter'](fakeInput);
+    expect(component['techStackTags']()).toEqual(['Angular', 'NgRx']);
+    expect(fakeInput.value).toBe('');
   });
 
   it('emits save with the updated application on a valid submit', () => {
@@ -50,6 +67,7 @@ describe('ApplicationEditModal', () => {
 
     expect(saved?.company).toBe('Nordic Fintech Renamed');
     expect(saved?.id).toBe('1');
+    expect(saved?.techStack).toEqual(['Angular', 'RxJS']);
   });
 
   it('does not emit save when the form is invalid', () => {

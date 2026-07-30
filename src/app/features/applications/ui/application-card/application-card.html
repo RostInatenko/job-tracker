@@ -13,6 +13,24 @@
     </button>
   </div>
   <p class="text-sm text-slate-600">{{ application().role }}</p>
+
+  @if (application().salary) {
+    <p class="mt-1 text-xs font-medium text-emerald-700">{{ application().salary }}</p>
+  }
+
+  @if (visibleTechStack().length) {
+    <div class="mt-2 flex flex-wrap gap-1">
+      @for (tech of visibleTechStack(); track tech) {
+        <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">{{ tech }}</span>
+      }
+      @if (hiddenTechStackCount() > 0) {
+        <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-400">
+          +{{ hiddenTechStackCount() }} more
+        </span>
+      }
+    </div>
+  }
+
   <p class="mt-2 text-xs text-slate-400">{{ application().dateApplied | date: 'mediumDate' }}</p>
 
   @if (application().notes) {

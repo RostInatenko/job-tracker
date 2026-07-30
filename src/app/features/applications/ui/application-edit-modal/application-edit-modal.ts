@@ -27,12 +27,45 @@ export class ApplicationEditModal implements OnInit {
       Validators.required,
     ),
     dateApplied: ['', Validators.required],
+    salary: [''],
     notes: [''],
     link: [''],
   });
 
+  protected readonly techStackTags = signal<string[]>([]);
+
   ngOnInit(): void {
-    this.form.patchValue(this.application());
+    const application = this.application();
+    this.form.patchValue(application);
+    this.techStackTags.set(application.techStack ?? []);
+  }
+
+  protected onTechInput(input: HTMLInputElement): void {
+    if (!input.value.includes(',')) {
+      return;
+    }
+
+    const parts = input.value.split(',');
+    const remainder = parts.pop() ?? '';
+    parts.forEach((part) => this.addTech(part));
+    input.value = remainder;
+  }
+
+  protected onTechInputEnter(input: HTMLInputElement): void {
+    this.addTech(input.value);
+    input.value = '';
+  }
+
+  protected onRemoveTech(tag: string): void {
+    this.techStackTags.update((tags) => tags.filter((existing) => existing !== tag));
+  }
+
+  private addTech(raw: string): void {
+    const trimmed = raw.trim();
+    if (!trimmed || this.techStackTags().includes(trimmed)) {
+      return;
+    }
+    this.techStackTags.update((tags) => [...tags, trimmed]);
   }
 
   protected onSave(): void {
@@ -50,6 +83,8 @@ export class ApplicationEditModal implements OnInit {
       dateApplied: value.dateApplied,
       notes: value.notes || undefined,
       link: value.link || undefined,
+      salary: value.salary || undefined,
+      techStack: this.techStackTags(),
     });
   }
 
