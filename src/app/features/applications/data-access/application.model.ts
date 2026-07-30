@@ -8,6 +8,8 @@ export interface JobApplication {
   dateApplied: string;
   notes?: string;
   link?: string;
+  techStack?: string[];
+  salary?: string;
 }
 
 export interface BoardColumnConfig {

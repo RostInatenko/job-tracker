@@ -5,6 +5,7 @@ import { Board } from '../../ui/board/board';
 import { UndoToast } from '../../ui/undo-toast/undo-toast';
 import { QuickAddForm } from '../../ui/quick-add-form/quick-add-form';
 import { ApplicationEditModal } from '../../ui/application-edit-modal/application-edit-modal';
+import { PastePostingModal } from '../../ui/paste-posting-modal/paste-posting-modal';
 import { ApplicationStatus, BOARD_COLUMNS, JobApplication } from '../../data-access/application.model';
 import { ApplicationsActions } from '../../data-access/applications.actions';
 import {
@@ -19,7 +20,7 @@ const UNDO_WINDOW_MS = 5000;
 
 @Component({
   selector: 'app-board-page',
-  imports: [Board, UndoToast, QuickAddForm, ApplicationEditModal],
+  imports: [Board, UndoToast, QuickAddForm, ApplicationEditModal, PastePostingModal],
   templateUrl: './board-page.html',
 })
 export class BoardPage {
@@ -32,6 +33,7 @@ export class BoardPage {
   protected readonly error = this.store.selectSignal(selectError);
   protected readonly mutationError = this.store.selectSignal(selectMutationError);
   protected readonly editingApplication = signal<JobApplication | null>(null);
+  protected readonly pastingPosting = signal(false);
   private editTriggerElement: HTMLElement | null = null;
 
   protected readonly undoMessage = computed(() => {
@@ -116,6 +118,23 @@ export class BoardPage {
         },
       }),
     );
+  }
+
+  protected onOpenPastePosting(): void {
+    this.pastingPosting.set(true);
+  }
+
+  protected onClosePastePosting(): void {
+    this.pastingPosting.set(false);
+  }
+
+  protected onPastedPosting(draft: Omit<JobApplication, 'id'>): void {
+    this.store.dispatch(
+      ApplicationsActions.applicationAdded({
+        application: { ...draft, id: crypto.randomUUID() },
+      }),
+    );
+    this.pastingPosting.set(false);
   }
 
   protected onEdit(application: JobApplication): void {

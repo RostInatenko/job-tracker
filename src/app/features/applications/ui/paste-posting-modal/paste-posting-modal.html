@@ -1,0 +1,156 @@
+<div
+  (click)="close.emit()"
+  (keydown.escape)="close.emit()"
+  class="fixed inset-0 flex items-center justify-center bg-black/40 p-4"
+>
+  <div
+    cdkTrapFocus
+    cdkTrapFocusAutoCapture
+    (click)="$event.stopPropagation()"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="paste-posting-heading"
+    class="w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
+  >
+    <h2 id="paste-posting-heading" class="mb-4 text-lg font-semibold text-slate-900">
+      Add from job posting
+    </h2>
+
+    @switch (phase()) {
+      @case ('paste') {
+        <label class="mb-3 block text-sm">
+          <span class="mb-1 block font-medium text-slate-700">Paste the job posting text</span>
+          <textarea
+            [(ngModel)]="jobPostingText"
+            rows="8"
+            class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+          ></textarea>
+        </label>
+
+        <div class="flex items-center justify-between">
+          <button
+            type="button"
+            (click)="onSkipToManual()"
+            class="rounded-md px-3 py-2 text-sm text-slate-600 hover:bg-slate-100"
+          >
+            Fill in manually instead
+          </button>
+          <button
+            type="button"
+            (click)="onExtract()"
+            class="rounded-md bg-slate-900 px-3 py-2 text-sm text-white hover:bg-slate-800"
+          >
+            Extract details
+          </button>
+        </div>
+      }
+
+      @case ('loading') {
+        <p class="py-8 text-center text-sm text-slate-600">Reading the posting…</p>
+      }
+
+      @case ('error') {
+        <p class="mb-4 text-sm text-red-600">{{ errorMessage() }}</p>
+        <div class="flex justify-end gap-2">
+          <button
+            type="button"
+            (click)="phase.set('paste')"
+            class="rounded-md px-3 py-2 text-sm text-slate-600 hover:bg-slate-100"
+          >
+            Try again
+          </button>
+          <button
+            type="button"
+            (click)="onSkipToManual()"
+            class="rounded-md bg-slate-900 px-3 py-2 text-sm text-white hover:bg-slate-800"
+          >
+            Fill in manually
+          </button>
+        </div>
+      }
+
+      @case ('review') {
+        <form [formGroup]="form" (ngSubmit)="onSave()">
+          <label class="mb-3 block text-sm">
+            <span class="mb-1 block font-medium text-slate-700">Company</span>
+            <input
+              formControlName="company"
+              class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            />
+          </label>
+
+          <label class="mb-3 block text-sm">
+            <span class="mb-1 block font-medium text-slate-700">Role</span>
+            <input
+              formControlName="role"
+              class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            />
+          </label>
+
+          <label class="mb-3 block text-sm">
+            <span class="mb-1 block font-medium text-slate-700">Status</span>
+            <select
+              formControlName="status"
+              class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            >
+              @for (column of columns; track column.status) {
+                <option [value]="column.status">{{ column.label }}</option>
+              }
+            </select>
+          </label>
+
+          <label class="mb-3 block text-sm">
+            <span class="mb-1 block font-medium text-slate-700">Date applied</span>
+            <input
+              type="date"
+              formControlName="dateApplied"
+              class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            />
+          </label>
+
+          <label class="mb-3 block text-sm">
+            <span class="mb-1 block font-medium text-slate-700">Tech stack</span>
+            <input
+              formControlName="techStack"
+              placeholder="Comma-separated, e.g. Node.js, TypeScript, Postgres"
+              class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            />
+          </label>
+
+          <label class="mb-3 block text-sm">
+            <span class="mb-1 block font-medium text-slate-700">Salary</span>
+            <input
+              formControlName="salary"
+              class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            />
+          </label>
+
+          <label class="mb-4 block text-sm">
+            <span class="mb-1 block font-medium text-slate-700">Notes</span>
+            <textarea
+              formControlName="notes"
+              rows="2"
+              class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            ></textarea>
+          </label>
+
+          <div class="flex justify-end gap-2">
+            <button
+              type="button"
+              (click)="close.emit()"
+              class="rounded-md px-3 py-2 text-sm text-slate-600 hover:bg-slate-100"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="rounded-md bg-slate-900 px-3 py-2 text-sm text-white hover:bg-slate-800"
+            >
+              Add application
+            </button>
+          </div>
+        </form>
+      }
+    }
+  </div>
+</div>

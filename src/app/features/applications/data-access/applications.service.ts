@@ -12,6 +12,8 @@ interface ApplicationRow {
   dateApplied: string;
   notes: string | null;
   link: string | null;
+  techStack: string[];
+  salary: string | null;
 }
 
 function toApplication(row: ApplicationRow): JobApplication {
@@ -23,6 +25,8 @@ function toApplication(row: ApplicationRow): JobApplication {
     dateApplied: row.dateApplied.slice(0, 10),
     notes: row.notes ?? undefined,
     link: row.link ?? undefined,
+    techStack: row.techStack,
+    salary: row.salary ?? undefined,
   };
 }
 
@@ -35,6 +39,8 @@ function toCreateBody(application: JobApplication) {
     dateApplied: application.dateApplied,
     notes: application.notes ?? null,
     link: application.link ?? null,
+    techStack: application.techStack ?? [],
+    salary: application.salary ?? null,
   };
 }
 
@@ -46,6 +52,8 @@ function toUpdateBody(application: JobApplication) {
     dateApplied: application.dateApplied,
     notes: application.notes ?? null,
     link: application.link ?? null,
+    techStack: application.techStack ?? [],
+    salary: application.salary ?? null,
   };
 }
 
