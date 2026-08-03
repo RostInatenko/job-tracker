@@ -1,6 +1,6 @@
 import { Component, computed, input, output } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { JobApplication } from '../../data-access/application.model';
+import { JobApplication, WORK_MODE_OPTIONS } from '../../data-access/application.model';
 
 const MAX_VISIBLE_TECH_TAGS = 5;
 const STALE_APPLIED_DAYS = 30;
@@ -18,6 +18,10 @@ function daysSince(dateIso: string): number {
 export class ApplicationCard {
   application = input.required<JobApplication>();
   edit = output<JobApplication>();
+
+  protected readonly workModeLabel = computed(
+    () => WORK_MODE_OPTIONS.find((option) => option.value === this.application().workMode)?.label ?? null,
+  );
 
   protected readonly visibleTechStack = computed(
     () => this.application().techStack?.slice(0, MAX_VISIBLE_TECH_TAGS) ?? [],

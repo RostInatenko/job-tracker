@@ -1,4 +1,5 @@
 export type ApplicationStatus = 'applied' | 'interview' | 'offer' | 'rejected';
+export type WorkMode = 'office' | 'hybrid' | 'remote';
 
 export interface InterviewStage {
   stage: string;
@@ -16,6 +17,7 @@ export interface JobApplication {
   techStack?: string[];
   salary?: string;
   interviewStages?: InterviewStage[];
+  workMode?: WorkMode;
 }
 
 export interface BoardColumnConfig {
@@ -28,6 +30,17 @@ export const BOARD_COLUMNS: readonly BoardColumnConfig[] = [
   { status: 'interview', label: 'Interview' },
   { status: 'offer', label: 'Offer' },
   { status: 'rejected', label: 'Rejected' },
+];
+
+export interface WorkModeOption {
+  value: WorkMode;
+  label: string;
+}
+
+export const WORK_MODE_OPTIONS: readonly WorkModeOption[] = [
+  { value: 'office', label: 'Office' },
+  { value: 'hybrid', label: 'Hybrid' },
+  { value: 'remote', label: 'Remote' },
 ];
 
 export interface MovePayload {

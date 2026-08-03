@@ -15,6 +15,7 @@ interface ApplicationRow {
   techStack: string[];
   salary: string | null;
   interviewStages: InterviewStage[];
+  workMode: string | null;
 }
 
 function toApplication(row: ApplicationRow): JobApplication {
@@ -29,6 +30,7 @@ function toApplication(row: ApplicationRow): JobApplication {
     techStack: row.techStack,
     salary: row.salary ?? undefined,
     interviewStages: row.interviewStages,
+    workMode: (row.workMode?.toLowerCase() as JobApplication['workMode']) ?? undefined,
   };
 }
 
@@ -44,6 +46,7 @@ function toCreateBody(application: JobApplication) {
     techStack: application.techStack ?? [],
     salary: application.salary ?? null,
     interviewStages: application.interviewStages ?? [],
+    workMode: application.workMode?.toUpperCase() ?? null,
   };
 }
 
@@ -58,6 +61,7 @@ function toUpdateBody(application: JobApplication) {
     techStack: application.techStack ?? [],
     salary: application.salary ?? null,
     interviewStages: application.interviewStages ?? [],
+    workMode: application.workMode?.toUpperCase() ?? null,
   };
 }
 

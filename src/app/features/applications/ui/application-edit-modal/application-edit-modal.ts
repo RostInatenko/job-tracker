@@ -6,6 +6,8 @@ import {
   BOARD_COLUMNS,
   InterviewStage,
   JobApplication,
+  WORK_MODE_OPTIONS,
+  WorkMode,
 } from '../../data-access/application.model';
 
 @Component({
@@ -22,7 +24,11 @@ export class ApplicationEditModal implements OnInit {
   close = output<void>();
 
   protected readonly columns = BOARD_COLUMNS;
+  protected readonly workModeOptions = WORK_MODE_OPTIONS;
   protected readonly confirmingDelete = signal(false);
+  protected readonly confirmingClose = signal(false);
+  private backdropPointerDown = false;
+  private nonFormDirty = false;
 
   protected readonly form = this.formBuilder.nonNullable.group({
     company: ['', Validators.required],
@@ -33,6 +39,7 @@ export class ApplicationEditModal implements OnInit {
     ),
     dateApplied: ['', Validators.required],
     salary: [''],
+    workMode: this.formBuilder.nonNullable.control<WorkMode | ''>(''),
     notes: [''],
     link: [''],
   });
@@ -68,6 +75,7 @@ export class ApplicationEditModal implements OnInit {
 
   protected onRemoveTech(tag: string): void {
     this.techStackTags.update((tags) => tags.filter((existing) => existing !== tag));
+    this.nonFormDirty = true;
   }
 
   private addTech(raw: string): void {
@@ -76,6 +84,7 @@ export class ApplicationEditModal implements OnInit {
       return;
     }
     this.techStackTags.update((tags) => [...tags, trimmed]);
+    this.nonFormDirty = true;
   }
 
   protected onAddStage(stageInput: HTMLInputElement, dateInput: HTMLInputElement): void {
@@ -87,10 +96,12 @@ export class ApplicationEditModal implements OnInit {
     this.interviewStages.update((stages) => [...stages, { stage, date }]);
     stageInput.value = '';
     dateInput.value = '';
+    this.nonFormDirty = true;
   }
 
   protected onRemoveStage(entry: InterviewStage): void {
     this.interviewStages.update((stages) => stages.filter((existing) => existing !== entry));
+    this.nonFormDirty = true;
   }
 
   protected onSave(): void {
@@ -109,6 +120,7 @@ export class ApplicationEditModal implements OnInit {
       notes: value.notes || undefined,
       link: value.link || undefined,
       salary: value.salary || undefined,
+      workMode: value.workMode || undefined,
       techStack: this.techStackTags(),
       interviewStages: this.interviewStages(),
     });
@@ -124,5 +136,38 @@ export class ApplicationEditModal implements OnInit {
 
   protected onDeleteConfirm(): void {
     this.delete.emit();
+  }
+
+  protected onBackdropMouseDown(event: MouseEvent): void {
+    this.backdropPointerDown = event.target === event.currentTarget;
+  }
+
+  protected onBackdropClick(event: MouseEvent): void {
+    const closedOnBackdrop = this.backdropPointerDown && event.target === event.currentTarget;
+    this.backdropPointerDown = false;
+    if (closedOnBackdrop) {
+      this.requestClose();
+    }
+  }
+
+  protected requestClose(): void {
+    if (this.hasUnsavedChanges()) {
+      this.confirmingClose.set(true);
+      return;
+    }
+    this.close.emit();
+  }
+
+  protected onCloseConfirm(): void {
+    this.confirmingClose.set(false);
+    this.close.emit();
+  }
+
+  protected onCloseCancel(): void {
+    this.confirmingClose.set(false);
+  }
+
+  private hasUnsavedChanges(): boolean {
+    return this.form.dirty || this.nonFormDirty;
   }
 }

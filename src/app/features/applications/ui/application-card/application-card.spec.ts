@@ -67,6 +67,22 @@ describe('ApplicationCard', () => {
     expect(emitCount).toBe(1);
   });
 
+  it('renders a work mode badge when set', () => {
+    const withWorkMode: JobApplication = { ...mockApplication, workMode: 'hybrid' };
+    const fixture = TestBed.createComponent(ApplicationCard);
+    fixture.componentRef.setInput('application', withWorkMode);
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Hybrid');
+  });
+
+  it('does not render a work mode badge when unset', () => {
+    const fixture = createComponent();
+    expect((fixture.nativeElement as HTMLElement).textContent).not.toContain('Office');
+    expect((fixture.nativeElement as HTMLElement).textContent).not.toContain('Hybrid');
+    expect((fixture.nativeElement as HTMLElement).textContent).not.toContain('Remote');
+  });
+
   it('does not emit edit when the posting link is clicked', () => {
     const withLink: JobApplication = { ...mockApplication, link: 'https://example.com/job' };
     const fixture = TestBed.createComponent(ApplicationCard);

@@ -1,6 +1,7 @@
 <div
-  (click)="close.emit()"
-  (keydown.escape)="close.emit()"
+  (mousedown)="onBackdropMouseDown($event)"
+  (click)="onBackdropClick($event)"
+  (keydown.escape)="requestClose()"
   class="fixed inset-0 flex items-center justify-center bg-black/40 p-4"
 >
   <form
@@ -12,8 +13,31 @@
     role="dialog"
     aria-modal="true"
     aria-labelledby="edit-modal-heading"
-    class="flex max-h-[85vh] w-full max-w-md flex-col rounded-lg border border-border bg-surface"
+    class="relative flex max-h-[85vh] w-full max-w-md flex-col rounded-lg border border-border bg-surface"
   >
+  @if (confirmingClose()) {
+    <div class="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-black/50 p-4">
+      <div class="w-full max-w-xs rounded-lg border border-border bg-surface p-4 text-sm">
+        <p class="mb-3 text-ink">Discard unsaved changes?</p>
+        <div class="flex justify-end gap-2">
+          <button
+            type="button"
+            (click)="onCloseCancel()"
+            class="rounded-md px-3 py-1.5 text-ink-soft hover:bg-surface-sunken"
+          >
+            Keep editing
+          </button>
+          <button
+            type="button"
+            (click)="onCloseConfirm()"
+            class="rounded-md bg-danger px-3 py-1.5 font-medium text-white hover:opacity-90"
+          >
+            Discard
+          </button>
+        </div>
+      </div>
+    </div>
+  }
   <div class="overflow-y-auto p-6">
     <h2 id="edit-modal-heading" class="mb-4 text-lg font-semibold text-ink">Edit application</h2>
 
@@ -41,6 +65,19 @@
       >
         @for (column of columns; track column.status) {
           <option [value]="column.status">{{ column.label }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="mb-3 block text-sm">
+      <span class="mb-1 block font-medium text-ink">Work mode</span>
+      <select
+        formControlName="workMode"
+        class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
+      >
+        <option value="">Not specified</option>
+        @for (option of workModeOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
         }
       </select>
     </label>
@@ -180,7 +217,7 @@
       <div class="flex gap-2">
         <button
           type="button"
-          (click)="close.emit()"
+          (click)="requestClose()"
           class="rounded-md px-3 py-2 text-sm text-ink-soft hover:bg-surface-sunken"
         >
           Cancel

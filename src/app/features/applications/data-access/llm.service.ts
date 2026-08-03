@@ -8,6 +8,8 @@ export interface JobPostingExtraction {
   role: string;
   techStack: string[];
   salary: string | null;
+  link: string | null;
+  workMode: 'OFFICE' | 'HYBRID' | 'REMOTE' | null;
 }
 
 @Injectable({ providedIn: 'root' })

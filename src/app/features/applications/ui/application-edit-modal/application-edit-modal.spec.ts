@@ -38,6 +38,7 @@ describe('ApplicationEditModal', () => {
       status: 'applied',
       dateApplied: '2026-06-28',
       salary: '$90,000 - $110,000',
+      workMode: '',
       notes: 'Referred by a friend',
       link: 'https://example.com/jobs/nordic-fintech',
     });
@@ -120,9 +121,40 @@ describe('ApplicationEditModal', () => {
     let emitted = false;
     fixture.componentInstance.close.subscribe(() => (emitted = true));
 
-    const backdrop = (fixture.nativeElement as HTMLElement).querySelector('div');
-    backdrop?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    const backdrop = (fixture.nativeElement as HTMLElement).querySelector('div') as HTMLElement;
+    backdrop.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    backdrop.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
+    expect(emitted).toBe(true);
+  });
+
+  it('does not emit close on a text-selection drag that starts inside the form and releases on the backdrop', () => {
+    const fixture = createComponent();
+    let emitted = false;
+    fixture.componentInstance.close.subscribe(() => (emitted = true));
+
+    const backdrop = (fixture.nativeElement as HTMLElement).querySelector('div') as HTMLElement;
+    const form = backdrop.querySelector('form') as HTMLElement;
+
+    form.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    backdrop.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(emitted).toBe(false);
+  });
+
+  it('asks for confirmation before closing when there are unsaved changes', () => {
+    const fixture = createComponent();
+    let emitted = false;
+    fixture.componentInstance.close.subscribe(() => (emitted = true));
+
+    fixture.componentInstance['form'].patchValue({ company: 'Changed Co' });
+    fixture.componentInstance['form'].markAsDirty();
+    fixture.componentInstance['requestClose']();
+
+    expect(emitted).toBe(false);
+    expect(fixture.componentInstance['confirmingClose']()).toBe(true);
+
+    fixture.componentInstance['onCloseConfirm']();
     expect(emitted).toBe(true);
   });
 });
