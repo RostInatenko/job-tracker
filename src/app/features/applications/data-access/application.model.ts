@@ -19,6 +19,8 @@ export interface JobApplication {
   salary?: string;
   interviewStages?: InterviewStage[];
   workMode?: WorkMode;
+  archived?: boolean;
+  heardBack?: boolean;
 }
 
 export interface BoardColumnConfig {
@@ -61,6 +63,26 @@ export interface StatusBreakdownEntry {
   count: number;
 }
 
+export type RejectionCategory =
+  | 'ghostedBeforeInterview'
+  | 'rejectedBeforeInterview'
+  | 'ghostedAfterInterview'
+  | 'rejectedAfterInterview'
+  | 'unknown';
+
+export interface RejectionBreakdownEntry {
+  category: RejectionCategory;
+  count: number;
+}
+
+export const REJECTION_CATEGORY_LABELS: Record<RejectionCategory, string> = {
+  ghostedBeforeInterview: 'No response, before interview',
+  rejectedBeforeInterview: 'Rejected, before interview',
+  ghostedAfterInterview: 'No response, after interview',
+  rejectedAfterInterview: 'Rejected, after interview',
+  unknown: 'Unknown',
+};
+
 export interface ApplicationStats {
   totalApplications: number;
   responseRate: number;
@@ -69,4 +91,5 @@ export interface ApplicationStats {
   topTechStack: TechStackFrequency[];
   statusBreakdown: StatusBreakdownEntry[];
   staleApplicationsCount: number;
+  rejectionBreakdown: RejectionBreakdownEntry[];
 }

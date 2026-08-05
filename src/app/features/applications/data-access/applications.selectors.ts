@@ -14,7 +14,9 @@ export const selectAllApplications = createSelector(selectApplicationsState, sel
 
 export const selectApplicationEntities = createSelector(selectApplicationsState, selectEntities);
 
-export const selectApplicationsByStatus = createSelector(selectAllApplications, groupByStatus);
+export const selectApplicationsByStatus = createSelector(selectAllApplications, (applications) =>
+  groupByStatus(applications.filter((application) => !application.archived)),
+);
 
 export const selectLastMove = createSelector(
   selectApplicationsState,

@@ -48,6 +48,7 @@ function stageAbsoluteLabel(entry: InterviewStage): string {
 export class ApplicationCard {
   application = input.required<JobApplication>();
   edit = output<JobApplication>();
+  archive = output<JobApplication>();
 
   protected readonly workModeLabel = computed(
     () => WORK_MODE_OPTIONS.find((option) => option.value === this.application().workMode)?.label ?? null,
@@ -106,5 +107,10 @@ export class ApplicationCard {
   protected onEditClick(event: Event): void {
     event.stopPropagation();
     this.edit.emit(this.application());
+  }
+
+  protected onArchiveClick(event: Event): void {
+    event.stopPropagation();
+    this.archive.emit(this.application());
   }
 }

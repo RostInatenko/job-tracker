@@ -16,4 +16,5 @@ export class BoardColumn {
 
   dropped = output<CdkDragDrop<JobApplication[]>>();
   edit = output<JobApplication>();
+  archive = output<JobApplication>();
 }

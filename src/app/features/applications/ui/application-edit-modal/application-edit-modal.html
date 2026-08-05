@@ -95,6 +95,32 @@
       </select>
     </label>
 
+    @if (selectedStatus() === 'rejected') {
+      <div class="mb-3 block text-sm">
+        <span class="mb-1 block font-medium text-ink">Did they respond?</span>
+        <div class="flex gap-2">
+          <button
+            type="button"
+            (click)="form.controls.heardBack.setValue('yes')"
+            [class.bg-surface-sunken]="form.controls.heardBack.value === 'yes'"
+            [class.border-border-strong]="form.controls.heardBack.value === 'yes'"
+            class="rounded-md border border-border px-3 py-1.5 text-sm text-ink-soft hover:bg-surface-sunken"
+          >
+            Yes
+          </button>
+          <button
+            type="button"
+            (click)="form.controls.heardBack.setValue('no')"
+            [class.bg-surface-sunken]="form.controls.heardBack.value === 'no'"
+            [class.border-border-strong]="form.controls.heardBack.value === 'no'"
+            class="rounded-md border border-border px-3 py-1.5 text-sm text-ink-soft hover:bg-surface-sunken"
+          >
+            No
+          </button>
+        </div>
+      </div>
+    }
+
     <label class="mb-3 block text-sm">
       <span class="mb-1 block font-medium text-ink">Work mode</span>
       <select
@@ -249,13 +275,22 @@
           </button>
         </div>
       } @else {
-        <button
-          type="button"
-          (click)="onDeleteClick()"
-          class="rounded-md px-3 py-2 text-sm font-medium text-danger hover:bg-danger-bg"
-        >
-          Delete
-        </button>
+        <div class="flex gap-2">
+          <button
+            type="button"
+            (click)="onDeleteClick()"
+            class="rounded-md px-3 py-2 text-sm font-medium text-danger hover:bg-danger-bg"
+          >
+            Delete
+          </button>
+          <button
+            type="button"
+            (click)="onArchiveToggle()"
+            class="rounded-md px-3 py-2 text-sm font-medium text-ink-soft hover:bg-surface-sunken"
+          >
+            {{ isArchived() ? 'Unarchive' : 'Archive' }}
+          </button>
+        </div>
       }
       <div class="flex gap-2">
         <button

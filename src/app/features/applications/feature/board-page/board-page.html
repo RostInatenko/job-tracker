@@ -33,6 +33,7 @@
     [applicationsByStatus]="applicationsByStatus()"
     (dropped)="onDropped($event)"
     (edit)="onEdit($event)"
+    (archive)="onArchiveStale($event)"
   />
 }
 
@@ -45,6 +46,7 @@
     [application]="application"
     (save)="onSaveEdit($event)"
     (delete)="onDeleteEdit()"
+    (archiveToggled)="onArchiveToggle()"
     (close)="onCloseEdit()"
   />
 }

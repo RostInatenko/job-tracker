@@ -1,4 +1,5 @@
 import { Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CdkTrapFocus } from '@angular/cdk/a11y';
 import { DatePipe } from '@angular/common';
@@ -27,6 +28,7 @@ export class ApplicationEditModal implements OnInit {
   save = output<JobApplication>();
   delete = output<void>();
   close = output<void>();
+  archiveToggled = output<void>();
 
   protected readonly columns = BOARD_COLUMNS;
   protected readonly workModeOptions = WORK_MODE_OPTIONS;
@@ -51,9 +53,16 @@ export class ApplicationEditModal implements OnInit {
     dateApplied: ['', Validators.required],
     salary: [''],
     workMode: this.formBuilder.nonNullable.control<WorkMode | ''>(''),
+    heardBack: this.formBuilder.nonNullable.control<'' | 'yes' | 'no'>(''),
     notes: [''],
     link: [''],
   });
+
+  protected readonly selectedStatus = toSignal(this.form.controls.status.valueChanges, {
+    initialValue: this.form.controls.status.value,
+  });
+
+  protected readonly isArchived = computed(() => this.application().archived ?? false);
 
   protected readonly techStackTags = signal<string[]>([]);
   protected readonly interviewStages = signal<InterviewStage[]>([]);
@@ -63,7 +72,11 @@ export class ApplicationEditModal implements OnInit {
 
   ngOnInit(): void {
     const application = this.application();
-    this.form.patchValue(application);
+    this.form.patchValue({
+      ...application,
+      heardBack:
+        application.heardBack === undefined ? '' : application.heardBack ? 'yes' : 'no',
+    });
     this.techStackTags.set(application.techStack ?? []);
     this.interviewStages.set(application.interviewStages ?? []);
   }
@@ -194,6 +207,7 @@ export class ApplicationEditModal implements OnInit {
       link: value.link || undefined,
       salary: value.salary || undefined,
       workMode: value.workMode || undefined,
+      heardBack: value.heardBack === '' ? undefined : value.heardBack === 'yes',
       techStack: this.techStackTags(),
       interviewStages: this.interviewStages(),
     });
@@ -209,6 +223,10 @@ export class ApplicationEditModal implements OnInit {
 
   protected onDeleteConfirm(): void {
     this.delete.emit();
+  }
+
+  protected onArchiveToggle(): void {
+    this.archiveToggled.emit();
   }
 
   protected onBackdropMouseDown(event: MouseEvent): void {

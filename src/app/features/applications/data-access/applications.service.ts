@@ -2,7 +2,12 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { ApplicationStats, InterviewStage, JobApplication } from './application.model';
+import {
+  ApplicationStats,
+  InterviewStage,
+  JobApplication,
+  RejectionBreakdownEntry,
+} from './application.model';
 
 interface ApplicationRow {
   id: string;
@@ -16,6 +21,8 @@ interface ApplicationRow {
   salary: string | null;
   interviewStages: InterviewStage[];
   workMode: string | null;
+  archived: boolean;
+  heardBack: boolean | null;
 }
 
 function toApplication(row: ApplicationRow): JobApplication {
@@ -31,6 +38,8 @@ function toApplication(row: ApplicationRow): JobApplication {
     salary: row.salary ?? undefined,
     interviewStages: row.interviewStages,
     workMode: (row.workMode?.toLowerCase() as JobApplication['workMode']) ?? undefined,
+    archived: row.archived,
+    heardBack: row.heardBack ?? undefined,
   };
 }
 
@@ -47,6 +56,8 @@ function toCreateBody(application: JobApplication) {
     salary: application.salary ?? null,
     interviewStages: application.interviewStages ?? [],
     workMode: application.workMode?.toUpperCase() ?? null,
+    archived: application.archived ?? false,
+    heardBack: application.heardBack ?? null,
   };
 }
 
@@ -58,6 +69,7 @@ interface StatsResponse {
   topTechStack: { tech: string; count: number }[];
   statusBreakdown: { status: string; count: number }[];
   staleApplicationsCount: number;
+  rejectionBreakdown: RejectionBreakdownEntry[];
 }
 
 function toStats(response: StatsResponse): ApplicationStats {
@@ -82,6 +94,8 @@ function toUpdateBody(application: JobApplication) {
     salary: application.salary ?? null,
     interviewStages: application.interviewStages ?? [],
     workMode: application.workMode?.toUpperCase() ?? null,
+    archived: application.archived ?? false,
+    heardBack: application.heardBack ?? null,
   };
 }
 
@@ -110,5 +124,11 @@ export class ApplicationsService {
 
   getStats(): Observable<ApplicationStats> {
     return this.http.get<StatsResponse>(`${this.baseUrl}/stats`).pipe(map(toStats));
+  }
+
+  getArchived(): Observable<JobApplication[]> {
+    return this.http
+      .get<ApplicationRow[]>(this.baseUrl, { params: { archived: true } })
+      .pipe(map((rows) => rows.map(toApplication)));
   }
 }

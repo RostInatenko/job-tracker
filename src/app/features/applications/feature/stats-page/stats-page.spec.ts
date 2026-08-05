@@ -22,6 +22,13 @@ describe('StatsPage', () => {
       { status: 'rejected', count: 0 },
     ],
     staleApplicationsCount: 1,
+    rejectionBreakdown: [
+      { category: 'ghostedBeforeInterview', count: 0 },
+      { category: 'rejectedBeforeInterview', count: 0 },
+      { category: 'ghostedAfterInterview', count: 0 },
+      { category: 'rejectedAfterInterview', count: 0 },
+      { category: 'unknown', count: 0 },
+    ],
   };
 
   function configure(applicationsServiceStub: Partial<ApplicationsService>) {
@@ -54,6 +61,38 @@ describe('StatsPage', () => {
     expect(text).toContain('1.5');
     expect(text).toContain('React');
     expect(text).toContain('Interview');
+  });
+
+  it('does not render a rejection breakdown section when there are no rejections', () => {
+    configure({ getStats: () => of(stats) });
+    const fixture = TestBed.createComponent(StatsPage);
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).textContent).not.toContain(
+      'Rejection breakdown',
+    );
+  });
+
+  it('renders non-zero rejection breakdown categories', () => {
+    const statsWithRejections: ApplicationStats = {
+      ...stats,
+      rejectionBreakdown: [
+        { category: 'ghostedBeforeInterview', count: 2 },
+        { category: 'rejectedBeforeInterview', count: 0 },
+        { category: 'ghostedAfterInterview', count: 0 },
+        { category: 'rejectedAfterInterview', count: 1 },
+        { category: 'unknown', count: 0 },
+      ],
+    };
+    configure({ getStats: () => of(statsWithRejections) });
+    const fixture = TestBed.createComponent(StatsPage);
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('Rejection breakdown');
+    expect(text).toContain('No response, before interview');
+    expect(text).toContain('Rejected, after interview');
+    expect(text).not.toContain('No response, after interview');
   });
 
   it('shows an error state with a retry option when loading fails', () => {

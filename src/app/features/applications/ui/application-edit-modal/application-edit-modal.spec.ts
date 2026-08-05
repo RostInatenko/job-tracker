@@ -43,6 +43,7 @@ describe('ApplicationEditModal', () => {
       dateApplied: '2026-06-28',
       salary: '$90,000 - $110,000',
       workMode: '',
+      heardBack: '',
       notes: 'Referred by a friend',
       link: 'https://example.com/jobs/nordic-fintech',
     });
@@ -83,6 +84,43 @@ describe('ApplicationEditModal', () => {
     expect(saved?.company).toBe('Nordic Fintech Renamed');
     expect(saved?.id).toBe('1');
     expect(saved?.techStack).toEqual(['Angular', 'RxJS']);
+  });
+
+  it('emits archiveToggled when the archive button is activated', () => {
+    const fixture = createComponent();
+    let emitted = false;
+    fixture.componentInstance.archiveToggled.subscribe(() => (emitted = true));
+
+    fixture.componentInstance['onArchiveToggle']();
+
+    expect(emitted).toBe(true);
+  });
+
+  it('labels the archive button based on the current archived state', () => {
+    const fixture = createComponent();
+    expect(fixture.componentInstance['isArchived']()).toBe(false);
+
+    const archivedFixture = TestBed.createComponent(ApplicationEditModal);
+    archivedFixture.componentRef.setInput('application', { ...application, archived: true });
+    archivedFixture.detectChanges();
+    expect(archivedFixture.componentInstance['isArchived']()).toBe(true);
+  });
+
+  it('maps the heard-back toggle to a boolean on save, and leaves it undefined when unset', () => {
+    const fixture = createComponent();
+    let saved: JobApplication | undefined;
+    fixture.componentInstance.save.subscribe((value) => (saved = value));
+
+    fixture.componentInstance['onSave'](emptyInput(), emptyInput(), emptyInput());
+    expect(saved?.heardBack).toBeUndefined();
+
+    fixture.componentInstance['form'].controls.heardBack.setValue('no');
+    fixture.componentInstance['onSave'](emptyInput(), emptyInput(), emptyInput());
+    expect(saved?.heardBack).toBe(false);
+
+    fixture.componentInstance['form'].controls.heardBack.setValue('yes');
+    fixture.componentInstance['onSave'](emptyInput(), emptyInput(), emptyInput());
+    expect(saved?.heardBack).toBe(true);
   });
 
   it('adds an interview stage with an optional time and sorts stages by date and time', () => {

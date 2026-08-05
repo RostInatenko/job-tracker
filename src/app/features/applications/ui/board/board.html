@@ -7,6 +7,7 @@
       [applications]="applicationsByStatus()[column.status]"
       (dropped)="dropped.emit({ status: column.status, event: $event })"
       (edit)="edit.emit($event)"
+      (archive)="archive.emit($event)"
     />
   }
 </div>

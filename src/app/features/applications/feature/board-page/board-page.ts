@@ -168,6 +168,28 @@ export class BoardPage {
     this.closeEdit();
   }
 
+  protected onArchiveToggle(): void {
+    const application = this.editingApplication();
+
+    if (!application) {
+      return;
+    }
+
+    this.archiveApplication(application, !application.archived);
+    this.closeEdit();
+  }
+
+  protected onArchiveStale(application: JobApplication): void {
+    this.archiveApplication(application, true);
+  }
+
+  private archiveApplication(application: JobApplication, archived: boolean): void {
+    const updated = { ...application, archived };
+    this.store.dispatch(
+      ApplicationsActions.applicationUpdated({ application: updated, previous: application }),
+    );
+  }
+
   private closeEdit(): void {
     this.editingApplication.set(null);
     this.editTriggerElement?.focus();

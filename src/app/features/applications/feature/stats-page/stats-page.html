@@ -73,5 +73,19 @@
         }
       </div>
     </div>
+
+    @if (hasRejections(data)) {
+      <div class="mt-4 rounded-md border border-border bg-surface p-4">
+        <h3 class="mb-3 text-sm font-semibold text-ink">Rejection breakdown</h3>
+        @for (entry of data.rejectionBreakdown; track entry.category) {
+          @if (entry.count > 0) {
+            <div class="flex items-center justify-between border-b border-border py-1.5 text-sm last:border-b-0">
+              <span class="text-ink-soft">{{ rejectionCategoryLabel(entry.category) }}</span>
+              <span class="font-medium text-ink">{{ entry.count }}</span>
+            </div>
+          }
+        }
+      </div>
+    }
   }
 }

@@ -194,6 +194,50 @@ describe('BoardPage', () => {
     expect(fixture.debugElement.query(By.directive(ApplicationEditModal))).toBeNull();
   });
 
+  it('archives a stale application directly from the board and removes it from view', () => {
+    const fixture = createLoadedFixture();
+    const boardDebugEl = fixture.debugElement.query(By.directive(Board));
+
+    boardDebugEl.triggerEventHandler('archive', {
+      id: '1',
+      company: 'Nordic Fintech',
+      role: 'Angular Developer',
+      status: 'applied',
+      dateApplied: '2026-06-28',
+    } satisfies JobApplication);
+    fixture.detectChanges();
+
+    const board = boardDebugEl.componentInstance as Board;
+    expect(board.applicationsByStatus().applied.some((application) => application.id === '1')).toBe(
+      false,
+    );
+  });
+
+  it('archives the application being edited from the modal and closes it', () => {
+    const fixture = createLoadedFixture();
+    const boardDebugEl = fixture.debugElement.query(By.directive(Board));
+
+    boardDebugEl.triggerEventHandler('edit', {
+      id: '1',
+      company: 'Nordic Fintech',
+      role: 'Angular Developer',
+      status: 'applied',
+      dateApplied: '2026-06-28',
+    } satisfies JobApplication);
+    fixture.detectChanges();
+
+    const modalDebugEl = fixture.debugElement.query(By.directive(ApplicationEditModal));
+    const modal = modalDebugEl.componentInstance as ApplicationEditModal;
+    modal.archiveToggled.emit();
+    fixture.detectChanges();
+
+    const board = boardDebugEl.componentInstance as Board;
+    expect(board.applicationsByStatus().applied.some((application) => application.id === '1')).toBe(
+      false,
+    );
+    expect(fixture.debugElement.query(By.directive(ApplicationEditModal))).toBeNull();
+  });
+
   it('shows a dismissable mutation error banner without hiding the board', () => {
     const fixture = createLoadedFixture();
 

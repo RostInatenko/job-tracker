@@ -1,7 +1,11 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ApplicationsService } from '../../data-access/applications.service';
-import { ApplicationStats, BOARD_COLUMNS } from '../../data-access/application.model';
+import {
+  ApplicationStats,
+  BOARD_COLUMNS,
+  REJECTION_CATEGORY_LABELS,
+} from '../../data-access/application.model';
 
 @Component({
   selector: 'app-stats-page',
@@ -25,6 +29,16 @@ export class StatsPage {
 
   protected statusLabel(status: ApplicationStats['statusBreakdown'][number]['status']): string {
     return BOARD_COLUMNS.find((column) => column.status === status)?.label ?? status;
+  }
+
+  protected rejectionCategoryLabel(
+    category: ApplicationStats['rejectionBreakdown'][number]['category'],
+  ): string {
+    return REJECTION_CATEGORY_LABELS[category];
+  }
+
+  protected hasRejections(stats: ApplicationStats): boolean {
+    return stats.rejectionBreakdown.some((entry) => entry.count > 0);
   }
 
   private load(): void {

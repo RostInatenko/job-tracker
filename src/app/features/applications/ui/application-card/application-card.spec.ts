@@ -168,6 +168,46 @@ describe('ApplicationCard', () => {
     expect(badge?.getAttribute('title')).toContain('09:30');
   });
 
+  it('shows an Archive button on a stale application and emits archive without triggering edit', () => {
+    const fixture = createComponent();
+    let archived: JobApplication | undefined;
+    let editEmitted = false;
+    fixture.componentInstance.archive.subscribe((application) => (archived = application));
+    fixture.componentInstance.edit.subscribe(() => (editEmitted = true));
+
+    const archiveButton = Array.from(
+      (fixture.nativeElement as HTMLElement).querySelectorAll('button'),
+    ).find((button) => button.textContent?.trim() === 'Archive');
+    archiveButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(archived).toEqual(mockApplication);
+    expect(editEmitted).toBe(false);
+  });
+
+  it('does not show an Archive button when the application is not stale', () => {
+    const fresh: JobApplication = { ...mockApplication, dateApplied: isoDateOffset(-1) };
+    const fixture = TestBed.createComponent(ApplicationCard);
+    fixture.componentRef.setInput('application', fresh);
+    fixture.detectChanges();
+
+    const archiveButton = Array.from(
+      (fixture.nativeElement as HTMLElement).querySelectorAll('button'),
+    ).find((button) => button.textContent?.trim() === 'Archive');
+    expect(archiveButton).toBeUndefined();
+  });
+
+  it('does not show an Archive button when the stale application is already archived', () => {
+    const archivedStale: JobApplication = { ...mockApplication, archived: true };
+    const fixture = TestBed.createComponent(ApplicationCard);
+    fixture.componentRef.setInput('application', archivedStale);
+    fixture.detectChanges();
+
+    const archiveButton = Array.from(
+      (fixture.nativeElement as HTMLElement).querySelectorAll('button'),
+    ).find((button) => button.textContent?.trim() === 'Archive');
+    expect(archiveButton).toBeUndefined();
+  });
+
   it('does not emit edit when the posting link is clicked', () => {
     const withLink: JobApplication = { ...mockApplication, link: 'https://example.com/job' };
     const fixture = TestBed.createComponent(ApplicationCard);

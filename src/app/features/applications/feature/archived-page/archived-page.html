@@ -1,0 +1,38 @@
+<div class="mb-4 flex items-center justify-between">
+  <h2 class="text-lg font-semibold text-ink">Archived applications</h2>
+  <a
+    routerLink="/"
+    class="rounded-md border border-border-strong px-3 py-2 text-sm font-medium text-ink-soft hover:bg-surface-sunken"
+  >
+    Back to board
+  </a>
+</div>
+
+@if (loading()) {
+  <p class="text-sm text-ink-soft">Loading archived applications…</p>
+} @else if (error()) {
+  <div class="flex items-center gap-3 rounded-md border border-danger/30 bg-danger-bg px-4 py-3 text-sm text-danger">
+    <span>Could not load archived applications.</span>
+    <button type="button" (click)="onRetry()" class="font-medium underline hover:no-underline">
+      Retry
+    </button>
+  </div>
+} @else if (applications().length) {
+  <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    @for (application of applications(); track application.id) {
+      <app-application-card [application]="application" (edit)="onEdit($event)" />
+    }
+  </div>
+} @else {
+  <p class="text-sm text-ink-soft">No archived applications yet.</p>
+}
+
+@if (editingApplication(); as application) {
+  <app-application-edit-modal
+    [application]="application"
+    (save)="onSaveEdit($event)"
+    (delete)="onDeleteEdit()"
+    (archiveToggled)="onArchiveToggle()"
+    (close)="onCloseEdit()"
+  />
+}

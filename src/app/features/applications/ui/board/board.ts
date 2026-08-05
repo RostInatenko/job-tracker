@@ -18,6 +18,7 @@ export class Board {
 
   dropped = output<{ status: ApplicationStatus; event: CdkDragDrop<JobApplication[]> }>();
   edit = output<JobApplication>();
+  archive = output<JobApplication>();
 
   columnIds = computed(() => this.columns().map((column) => column.status));
 }

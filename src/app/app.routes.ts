@@ -33,4 +33,12 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/applications/feature/stats-page/stats-page').then((m) => m.StatsPage),
   },
+  {
+    path: 'archived',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/applications/feature/archived-page/archived-page').then(
+        (m) => m.ArchivedPage,
+      ),
+  },
 ];
