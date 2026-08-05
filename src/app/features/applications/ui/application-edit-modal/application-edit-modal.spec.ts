@@ -114,6 +114,27 @@ describe('ApplicationEditModal', () => {
     expect(component['interviewStages']()).toEqual([{ stage: 'Offer call', date: '2026-07-15' }]);
   });
 
+  it('loads a stage back into the add-row inputs for editing and removes it from the list', () => {
+    const fixture = createComponent();
+    const component = fixture.componentInstance;
+
+    const stageInput = { value: 'Tech interview' } as HTMLInputElement;
+    const dateInput = { value: '2026-07-10' } as HTMLInputElement;
+    const timeInput = { value: '14:30' } as HTMLInputElement;
+    component['onAddStage'](stageInput, dateInput, timeInput);
+
+    const [entry] = component['interviewStages']();
+    const editStageInput = { value: '', focus: () => {} } as HTMLInputElement;
+    const editDateInput = { value: '' } as HTMLInputElement;
+    const editTimeInput = { value: '' } as HTMLInputElement;
+    component['onEditStage'](entry, editStageInput, editDateInput, editTimeInput);
+
+    expect(component['interviewStages']()).toEqual([]);
+    expect(editStageInput.value).toBe('Tech interview');
+    expect(editDateInput.value).toBe('2026-07-10');
+    expect(editTimeInput.value).toBe('14:30');
+  });
+
   it('does not emit save when the form is invalid', () => {
     const fixture = createComponent();
     let emitted = false;

@@ -124,6 +124,20 @@ export class ApplicationEditModal implements OnInit {
     this.nonFormDirty = true;
   }
 
+  protected onEditStage(
+    entry: InterviewStage,
+    stageInput: HTMLInputElement,
+    dateInput: HTMLInputElement,
+    timeInput: HTMLInputElement,
+  ): void {
+    this.interviewStages.update((stages) => stages.filter((existing) => existing !== entry));
+    stageInput.value = entry.stage;
+    dateInput.value = entry.date;
+    timeInput.value = entry.time ?? '';
+    stageInput.focus();
+    this.nonFormDirty = true;
+  }
+
   protected onSave(
     stageInput: HTMLInputElement,
     dateInput: HTMLInputElement,

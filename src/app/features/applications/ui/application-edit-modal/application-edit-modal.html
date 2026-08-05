@@ -167,6 +167,13 @@
             </span>
             <button
               type="button"
+              (click)="onEditStage(entry, stageInput, dateInput, timeInput)"
+              class="text-xs text-ink-faint hover:text-ink"
+            >
+              Edit
+            </button>
+            <button
+              type="button"
               (click)="onRemoveStage(entry)"
               class="text-xs text-ink-faint hover:text-ink"
             >
