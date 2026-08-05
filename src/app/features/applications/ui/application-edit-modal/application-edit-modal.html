@@ -97,7 +97,9 @@
 
     @if (selectedStatus() === 'rejected') {
       <div class="mb-3 block text-sm">
-        <span class="mb-1 block font-medium text-ink">Did they respond?</span>
+        <span class="mb-1 block font-medium text-ink">
+          Did they explicitly reject you, or did they just stop responding?
+        </span>
         <div class="flex gap-2">
           <button
             type="button"
@@ -106,7 +108,7 @@
             [class.border-border-strong]="form.controls.heardBack.value === 'yes'"
             class="rounded-md border border-border px-3 py-1.5 text-sm text-ink-soft hover:bg-surface-sunken"
           >
-            Yes
+            Rejected me
           </button>
           <button
             type="button"
@@ -115,7 +117,7 @@
             [class.border-border-strong]="form.controls.heardBack.value === 'no'"
             class="rounded-md border border-border px-3 py-1.5 text-sm text-ink-soft hover:bg-surface-sunken"
           >
-            No
+            Stopped responding
           </button>
         </div>
       </div>

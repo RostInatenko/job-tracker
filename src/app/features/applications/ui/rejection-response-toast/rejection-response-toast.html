@@ -1,21 +1,21 @@
 <div
   class="fixed bottom-20 left-1/2 flex -translate-x-1/2 items-center gap-4 rounded-md bg-slate-900 px-4 py-3 text-sm text-white shadow-lg"
 >
-  <span>Did {{ company() }} respond before rejecting you?</span>
+  <span>Did {{ company() }} explicitly reject you, or did they just stop responding?</span>
   <div class="flex gap-2">
     <button
       type="button"
       class="font-medium text-blue-300 hover:text-blue-200"
       (click)="respond.emit(true)"
     >
-      Yes
+      Rejected me
     </button>
     <button
       type="button"
       class="font-medium text-blue-300 hover:text-blue-200"
       (click)="respond.emit(false)"
     >
-      No
+      Stopped responding
     </button>
   </div>
 </div>

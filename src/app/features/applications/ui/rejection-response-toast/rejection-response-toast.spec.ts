@@ -20,28 +20,28 @@ describe('RejectionResponseToast', () => {
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('Nordic Fintech');
   });
 
-  it('emits respond(true) when Yes is clicked', () => {
+  it('emits respond(true) when "Rejected me" is clicked', () => {
     const fixture = createComponent();
     let responded: boolean | undefined;
     fixture.componentInstance.respond.subscribe((value) => (responded = value));
 
-    const yesButton = Array.from(
+    const rejectedButton = Array.from(
       (fixture.nativeElement as HTMLElement).querySelectorAll('button'),
-    ).find((button) => button.textContent?.trim() === 'Yes');
-    yesButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    ).find((button) => button.textContent?.trim() === 'Rejected me');
+    rejectedButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
     expect(responded).toBe(true);
   });
 
-  it('emits respond(false) when No is clicked', () => {
+  it('emits respond(false) when "Stopped responding" is clicked', () => {
     const fixture = createComponent();
     let responded: boolean | undefined;
     fixture.componentInstance.respond.subscribe((value) => (responded = value));
 
-    const noButton = Array.from(
+    const stoppedButton = Array.from(
       (fixture.nativeElement as HTMLElement).querySelectorAll('button'),
-    ).find((button) => button.textContent?.trim() === 'No');
-    noButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    ).find((button) => button.textContent?.trim() === 'Stopped responding');
+    stoppedButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
     expect(responded).toBe(false);
   });

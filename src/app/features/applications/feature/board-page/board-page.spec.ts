@@ -174,10 +174,10 @@ describe('BoardPage', () => {
     fixture.detectChanges();
 
     const toast = fixture.debugElement.query(By.directive(RejectionResponseToast));
-    const noButton = Array.from(
+    const stoppedRespondingButton = Array.from(
       (toast.nativeElement as HTMLElement).querySelectorAll('button'),
-    ).find((button) => button.textContent?.trim() === 'No');
-    noButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    ).find((button) => button.textContent?.trim() === 'Stopped responding');
+    stoppedRespondingButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     fixture.detectChanges();
 
     const board = boardDebugEl.componentInstance as Board;
