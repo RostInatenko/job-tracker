@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { InterviewStage, JobApplication } from './application.model';
+import { ApplicationStats, InterviewStage, JobApplication } from './application.model';
 
 interface ApplicationRow {
   id: string;
@@ -50,6 +50,26 @@ function toCreateBody(application: JobApplication) {
   };
 }
 
+interface StatsResponse {
+  totalApplications: number;
+  responseRate: number;
+  avgDaysToFirstInterview: number | null;
+  avgInterviewStageCount: number | null;
+  topTechStack: { tech: string; count: number }[];
+  statusBreakdown: { status: string; count: number }[];
+  staleApplicationsCount: number;
+}
+
+function toStats(response: StatsResponse): ApplicationStats {
+  return {
+    ...response,
+    statusBreakdown: response.statusBreakdown.map((entry) => ({
+      status: entry.status.toLowerCase() as JobApplication['status'],
+      count: entry.count,
+    })),
+  };
+}
+
 function toUpdateBody(application: JobApplication) {
   return {
     company: application.company,
@@ -86,5 +106,9 @@ export class ApplicationsService {
 
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  getStats(): Observable<ApplicationStats> {
+    return this.http.get<StatsResponse>(`${this.baseUrl}/stats`).pipe(map(toStats));
   }
 }

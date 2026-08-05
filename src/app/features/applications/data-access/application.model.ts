@@ -50,3 +50,23 @@ export interface MovePayload {
   previousIndex: number;
   currentIndex: number;
 }
+
+export interface TechStackFrequency {
+  tech: string;
+  count: number;
+}
+
+export interface StatusBreakdownEntry {
+  status: ApplicationStatus;
+  count: number;
+}
+
+export interface ApplicationStats {
+  totalApplications: number;
+  responseRate: number;
+  avgDaysToFirstInterview: number | null;
+  avgInterviewStageCount: number | null;
+  topTechStack: TechStackFrequency[];
+  statusBreakdown: StatusBreakdownEntry[];
+  staleApplicationsCount: number;
+}

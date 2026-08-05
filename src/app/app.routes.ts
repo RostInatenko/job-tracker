@@ -27,4 +27,10 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/applications/feature/board-page/board-page').then((m) => m.BoardPage),
   },
+  {
+    path: 'stats',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/applications/feature/stats-page/stats-page').then((m) => m.StatsPage),
+  },
 ];

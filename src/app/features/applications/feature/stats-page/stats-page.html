@@ -1,0 +1,77 @@
+<div class="mb-4 flex items-center justify-between">
+  <h2 class="text-lg font-semibold text-ink">Application stats</h2>
+  <a
+    routerLink="/"
+    class="rounded-md border border-border-strong px-3 py-2 text-sm font-medium text-ink-soft hover:bg-surface-sunken"
+  >
+    Back to board
+  </a>
+</div>
+
+@if (loading()) {
+  <p class="text-sm text-ink-soft">Loading stats…</p>
+} @else if (error()) {
+  <div class="flex items-center gap-3 rounded-md border border-danger/30 bg-danger-bg px-4 py-3 text-sm text-danger">
+    <span>Could not load stats.</span>
+    <button type="button" (click)="onRetry()" class="font-medium underline hover:no-underline">
+      Retry
+    </button>
+  </div>
+} @else if (stats(); as data) {
+  @if (data.totalApplications === 0) {
+    <p class="text-sm text-ink-soft">Add a few applications to see stats here.</p>
+  } @else {
+    <div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
+      <div class="rounded-md border border-border bg-surface p-4">
+        <p class="text-xs font-medium text-ink-soft">Total applications</p>
+        <p class="mt-1 text-2xl font-semibold text-ink">{{ data.totalApplications }}</p>
+      </div>
+      <div class="rounded-md border border-border bg-surface p-4">
+        <p class="text-xs font-medium text-ink-soft">Response rate</p>
+        <p class="mt-1 text-2xl font-semibold text-ink">{{ data.responseRate }}%</p>
+      </div>
+      <div class="rounded-md border border-border bg-surface p-4">
+        <p class="text-xs font-medium text-ink-soft">Avg. days to first interview</p>
+        <p class="mt-1 text-2xl font-semibold text-ink">
+          {{ data.avgDaysToFirstInterview ?? '—' }}
+        </p>
+      </div>
+      <div class="rounded-md border border-border bg-surface p-4">
+        <p class="text-xs font-medium text-ink-soft">Avg. interview stages</p>
+        <p class="mt-1 text-2xl font-semibold text-ink">
+          {{ data.avgInterviewStageCount ?? '—' }}
+        </p>
+      </div>
+      <div class="rounded-md border border-border bg-surface p-4">
+        <p class="text-xs font-medium text-ink-soft">Stale applications</p>
+        <p class="mt-1 text-2xl font-semibold text-ink">{{ data.staleApplicationsCount }}</p>
+      </div>
+    </div>
+
+    <div class="mt-6 grid gap-4 sm:grid-cols-2">
+      <div class="rounded-md border border-border bg-surface p-4">
+        <h3 class="mb-3 text-sm font-semibold text-ink">Status breakdown</h3>
+        @for (entry of data.statusBreakdown; track entry.status) {
+          <div class="flex items-center justify-between border-b border-border py-1.5 text-sm last:border-b-0">
+            <span class="text-ink-soft">{{ statusLabel(entry.status) }}</span>
+            <span class="font-medium text-ink">{{ entry.count }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="rounded-md border border-border bg-surface p-4">
+        <h3 class="mb-3 text-sm font-semibold text-ink">Most common tech stack</h3>
+        @if (data.topTechStack.length) {
+          @for (entry of data.topTechStack; track entry.tech) {
+            <div class="flex items-center justify-between border-b border-border py-1.5 text-sm last:border-b-0">
+              <span class="text-ink-soft">{{ entry.tech }}</span>
+              <span class="font-medium text-ink">{{ entry.count }}</span>
+            </div>
+          }
+        } @else {
+          <p class="text-sm text-ink-faint">No tech stack data yet.</p>
+        }
+      </div>
+    </div>
+  }
+}
