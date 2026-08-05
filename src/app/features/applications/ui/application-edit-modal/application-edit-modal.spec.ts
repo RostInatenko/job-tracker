@@ -62,6 +62,16 @@ describe('ApplicationEditModal', () => {
     expect(fakeInput.value).toBe('');
   });
 
+  it('treats tech stack tags as case-insensitive when checking for duplicates', () => {
+    const fixture = createComponent();
+    const component = fixture.componentInstance;
+
+    const fakeInput = { value: 'angular' } as HTMLInputElement;
+    component['onTechInputEnter'](fakeInput);
+
+    expect(component['techStackTags']()).toEqual(['Angular', 'RxJS']);
+  });
+
   it('emits save with the updated application on a valid submit', () => {
     const fixture = createComponent();
     let saved: JobApplication | undefined;

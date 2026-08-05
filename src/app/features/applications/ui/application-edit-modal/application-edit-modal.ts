@@ -91,7 +91,10 @@ export class ApplicationEditModal implements OnInit {
 
   private addTech(raw: string): void {
     const trimmed = raw.trim();
-    if (!trimmed || this.techStackTags().includes(trimmed)) {
+    const isDuplicate = this.techStackTags().some(
+      (existing) => existing.toLowerCase() === trimmed.toLowerCase(),
+    );
+    if (!trimmed || isDuplicate) {
       return;
     }
     this.techStackTags.update((tags) => [...tags, trimmed]);
