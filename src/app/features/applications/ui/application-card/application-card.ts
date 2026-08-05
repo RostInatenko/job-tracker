@@ -1,6 +1,7 @@
 import { Component, computed, input, output } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { InterviewStage, JobApplication, WORK_MODE_OPTIONS } from '../../data-access/application.model';
+import { GhostIcon } from '../ghost-icon/ghost-icon';
 
 const MAX_VISIBLE_TECH_TAGS = 5;
 const STALE_APPLIED_DAYS = 30;
@@ -42,7 +43,7 @@ function stageAbsoluteLabel(entry: InterviewStage): string {
 
 @Component({
   selector: 'app-application-card',
-  imports: [DatePipe],
+  imports: [DatePipe, GhostIcon],
   templateUrl: './application-card.html',
 })
 export class ApplicationCard {
@@ -94,6 +95,10 @@ export class ApplicationCard {
     const stage = this.latestInterviewStage();
     return stage ? stageAbsoluteLabel(stage) : null;
   });
+
+  protected readonly isGhosted = computed(
+    () => this.application().status === 'rejected' && this.application().heardBack === false,
+  );
 
   protected readonly staleDays = computed(() => {
     const application = this.application();

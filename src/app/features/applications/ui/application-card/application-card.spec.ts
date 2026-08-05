@@ -208,6 +208,46 @@ describe('ApplicationCard', () => {
     expect(archiveButton).toBeUndefined();
   });
 
+  it('shows a ghost icon on a rejected application with no response', () => {
+    const ghosted: JobApplication = { ...mockApplication, status: 'rejected', heardBack: false };
+    const fixture = TestBed.createComponent(ApplicationCard);
+    fixture.componentRef.setInput('application', ghosted);
+    fixture.detectChanges();
+
+    expect(
+      (fixture.nativeElement as HTMLElement).querySelector('app-ghost-icon'),
+    ).toBeTruthy();
+  });
+
+  it('does not show a ghost icon on a rejected application that did respond', () => {
+    const rejected: JobApplication = { ...mockApplication, status: 'rejected', heardBack: true };
+    const fixture = TestBed.createComponent(ApplicationCard);
+    fixture.componentRef.setInput('application', rejected);
+    fixture.detectChanges();
+
+    expect(
+      (fixture.nativeElement as HTMLElement).querySelector('app-ghost-icon'),
+    ).toBeNull();
+  });
+
+  it('does not show a ghost icon when the response is unknown', () => {
+    const rejectedUnknown: JobApplication = { ...mockApplication, status: 'rejected' };
+    const fixture = TestBed.createComponent(ApplicationCard);
+    fixture.componentRef.setInput('application', rejectedUnknown);
+    fixture.detectChanges();
+
+    expect(
+      (fixture.nativeElement as HTMLElement).querySelector('app-ghost-icon'),
+    ).toBeNull();
+  });
+
+  it('does not show a ghost icon on a non-rejected application', () => {
+    const fixture = createComponent();
+    expect(
+      (fixture.nativeElement as HTMLElement).querySelector('app-ghost-icon'),
+    ).toBeNull();
+  });
+
   it('does not emit edit when the posting link is clicked', () => {
     const withLink: JobApplication = { ...mockApplication, link: 'https://example.com/job' };
     const fixture = TestBed.createComponent(ApplicationCard);
