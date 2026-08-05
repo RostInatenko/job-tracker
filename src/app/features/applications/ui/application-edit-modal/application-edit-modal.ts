@@ -32,8 +32,14 @@ export class ApplicationEditModal implements OnInit {
   protected readonly workModeOptions = WORK_MODE_OPTIONS;
   protected readonly confirmingDelete = signal(false);
   protected readonly confirmingClose = signal(false);
+  protected readonly confirmingIncompleteStage = signal(false);
   private backdropPointerDown = false;
   private nonFormDirty = false;
+  private pendingStageInputs: {
+    stageInput: HTMLInputElement;
+    dateInput: HTMLInputElement;
+    timeInput: HTMLInputElement;
+  } | null = null;
 
   protected readonly form = this.formBuilder.nonNullable.group({
     company: ['', Validators.required],
@@ -118,7 +124,43 @@ export class ApplicationEditModal implements OnInit {
     this.nonFormDirty = true;
   }
 
-  protected onSave(): void {
+  protected onSave(
+    stageInput: HTMLInputElement,
+    dateInput: HTMLInputElement,
+    timeInput: HTMLInputElement,
+  ): void {
+    const stage = stageInput.value.trim();
+    const date = dateInput.value;
+    const time = timeInput.value;
+
+    if (stage && date) {
+      this.onAddStage(stageInput, dateInput, timeInput);
+    } else if (stage || date || time) {
+      this.pendingStageInputs = { stageInput, dateInput, timeInput };
+      this.confirmingIncompleteStage.set(true);
+      return;
+    }
+
+    this.commitSave();
+  }
+
+  protected onDiscardIncompleteStageAndSave(): void {
+    this.confirmingIncompleteStage.set(false);
+    if (this.pendingStageInputs) {
+      this.pendingStageInputs.stageInput.value = '';
+      this.pendingStageInputs.dateInput.value = '';
+      this.pendingStageInputs.timeInput.value = '';
+      this.pendingStageInputs = null;
+    }
+    this.commitSave();
+  }
+
+  protected onCancelIncompleteStage(): void {
+    this.confirmingIncompleteStage.set(false);
+    this.pendingStageInputs = null;
+  }
+
+  private commitSave(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;

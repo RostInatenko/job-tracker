@@ -2,6 +2,10 @@ import { TestBed } from '@angular/core/testing';
 import { ApplicationEditModal } from './application-edit-modal';
 import { JobApplication } from '../../data-access/application.model';
 
+function emptyInput(): HTMLInputElement {
+  return { value: '' } as HTMLInputElement;
+}
+
 describe('ApplicationEditModal', () => {
   const application: JobApplication = {
     id: '1',
@@ -64,7 +68,7 @@ describe('ApplicationEditModal', () => {
     fixture.componentInstance.save.subscribe((value) => (saved = value));
 
     fixture.componentInstance['form'].patchValue({ company: 'Nordic Fintech Renamed' });
-    fixture.componentInstance['onSave']();
+    fixture.componentInstance['onSave'](emptyInput(), emptyInput(), emptyInput());
 
     expect(saved?.company).toBe('Nordic Fintech Renamed');
     expect(saved?.id).toBe('1');
@@ -116,9 +120,64 @@ describe('ApplicationEditModal', () => {
     fixture.componentInstance.save.subscribe(() => (emitted = true));
 
     fixture.componentInstance['form'].patchValue({ company: '' });
-    fixture.componentInstance['onSave']();
+    fixture.componentInstance['onSave'](emptyInput(), emptyInput(), emptyInput());
 
     expect(emitted).toBe(false);
+  });
+
+  it('auto-adds a complete but unsubmitted interview stage before saving', () => {
+    const fixture = createComponent();
+    const component = fixture.componentInstance;
+    let saved: JobApplication | undefined;
+    component.save.subscribe((value) => (saved = value));
+
+    const stageInput = { value: 'Tech interview' } as HTMLInputElement;
+    const dateInput = { value: '2026-07-10' } as HTMLInputElement;
+    const timeInput = { value: '14:30' } as HTMLInputElement;
+    component['onSave'](stageInput, dateInput, timeInput);
+
+    expect(saved?.interviewStages).toEqual([
+      { stage: 'Tech interview', date: '2026-07-10', time: '14:30' },
+    ]);
+    expect(component['confirmingIncompleteStage']()).toBe(false);
+  });
+
+  it('asks for confirmation instead of saving when the stage row is only partially filled', () => {
+    const fixture = createComponent();
+    const component = fixture.componentInstance;
+    let emitted = false;
+    component.save.subscribe(() => (emitted = true));
+
+    const stageInput = { value: 'Tech interview' } as HTMLInputElement;
+    const dateInput = { value: '' } as HTMLInputElement;
+    const timeInput = { value: '' } as HTMLInputElement;
+    component['onSave'](stageInput, dateInput, timeInput);
+
+    expect(emitted).toBe(false);
+    expect(component['confirmingIncompleteStage']()).toBe(true);
+
+    component['onDiscardIncompleteStageAndSave']();
+
+    expect(emitted).toBe(true);
+    expect(component['interviewStages']()).toEqual([]);
+    expect(stageInput.value).toBe('');
+  });
+
+  it('cancelling the incomplete-stage confirmation keeps the typed values and does not save', () => {
+    const fixture = createComponent();
+    const component = fixture.componentInstance;
+    let emitted = false;
+    component.save.subscribe(() => (emitted = true));
+
+    const stageInput = { value: 'Tech interview' } as HTMLInputElement;
+    const dateInput = { value: '' } as HTMLInputElement;
+    const timeInput = { value: '' } as HTMLInputElement;
+    component['onSave'](stageInput, dateInput, timeInput);
+    component['onCancelIncompleteStage']();
+
+    expect(emitted).toBe(false);
+    expect(component['confirmingIncompleteStage']()).toBe(false);
+    expect(stageInput.value).toBe('Tech interview');
   });
 
   it('does not emit delete on the first click, only after confirming', () => {
