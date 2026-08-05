@@ -4,11 +4,15 @@ import { By } from '@angular/platform-browser';
 import { Store, provideState, provideStore } from '@ngrx/store';
 import { Board } from '../../ui/board/board';
 import { UndoToast } from '../../ui/undo-toast/undo-toast';
+import { RejectionResponseToast } from '../../ui/rejection-response-toast/rejection-response-toast';
 import { QuickAddForm } from '../../ui/quick-add-form/quick-add-form';
 import { ApplicationEditModal } from '../../ui/application-edit-modal/application-edit-modal';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { JobApplication } from '../../data-access/application.model';
-import { APPLICATIONS_FEATURE_KEY } from '../../data-access/applications.selectors';
+import {
+  APPLICATIONS_FEATURE_KEY,
+  selectApplicationEntities,
+} from '../../data-access/applications.selectors';
 import { applicationsReducer } from '../../data-access/applications.reducer';
 import { ApplicationsActions } from '../../data-access/applications.actions';
 
@@ -118,6 +122,72 @@ describe('BoardPage', () => {
     expect(fixture.debugElement.query(By.directive(UndoToast))).toBeNull();
   });
 
+  it('shows a rejection response prompt when a card is moved into Rejected', () => {
+    const fixture = createLoadedFixture();
+    const boardDebugEl = fixture.debugElement.query(By.directive(Board));
+    const payload = {
+      status: 'rejected',
+      event: { previousContainer: { id: 'applied' }, previousIndex: 0, currentIndex: 0 } as CdkDragDrop<JobApplication[]>,
+    };
+
+    boardDebugEl.triggerEventHandler('dropped', payload);
+    fixture.detectChanges();
+
+    const toast = fixture.debugElement.query(By.directive(RejectionResponseToast));
+    expect(toast).toBeTruthy();
+    expect((toast.nativeElement as HTMLElement).textContent).toContain('Nordic Fintech');
+  });
+
+  it('does not show a rejection response prompt when reordering within Rejected', () => {
+    const fixture = TestBed.createComponent(BoardPage);
+    fixture.detectChanges();
+
+    const store = TestBed.inject(Store);
+    store.dispatch(
+      ApplicationsActions.loadApplicationsSuccess({
+        applications: [{ ...testApplications[0], status: 'rejected' }],
+      }),
+    );
+    fixture.detectChanges();
+
+    store.dispatch(
+      ApplicationsActions.applicationMoved({
+        status: 'rejected',
+        previousStatus: 'rejected',
+        previousIndex: 0,
+        currentIndex: 0,
+      }),
+    );
+    fixture.detectChanges();
+
+    expect(fixture.debugElement.query(By.directive(RejectionResponseToast))).toBeNull();
+  });
+
+  it('records the response and dismisses the prompt when answered', () => {
+    const fixture = createLoadedFixture();
+    const boardDebugEl = fixture.debugElement.query(By.directive(Board));
+
+    boardDebugEl.triggerEventHandler('dropped', {
+      status: 'rejected',
+      event: { previousContainer: { id: 'applied' }, previousIndex: 0, currentIndex: 0 } as CdkDragDrop<JobApplication[]>,
+    });
+    fixture.detectChanges();
+
+    const toast = fixture.debugElement.query(By.directive(RejectionResponseToast));
+    const noButton = Array.from(
+      (toast.nativeElement as HTMLElement).querySelectorAll('button'),
+    ).find((button) => button.textContent?.trim() === 'No');
+    noButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    fixture.detectChanges();
+
+    const board = boardDebugEl.componentInstance as Board;
+    const rejectedApplication = board
+      .applicationsByStatus()
+      .rejected.find((application) => application.id === '1');
+    expect(rejectedApplication?.heardBack).toBe(false);
+    expect(fixture.debugElement.query(By.directive(RejectionResponseToast))).toBeNull();
+  });
+
   it('adds a new application from the quick-add form', () => {
     const fixture = createLoadedFixture();
 
@@ -194,7 +264,7 @@ describe('BoardPage', () => {
     expect(fixture.debugElement.query(By.directive(ApplicationEditModal))).toBeNull();
   });
 
-  it('archives a stale application directly from the board and removes it from view', () => {
+  it('archives a stale application as a silent rejection and removes it from view', () => {
     const fixture = createLoadedFixture();
     const boardDebugEl = fixture.debugElement.query(By.directive(Board));
 
@@ -211,6 +281,12 @@ describe('BoardPage', () => {
     expect(board.applicationsByStatus().applied.some((application) => application.id === '1')).toBe(
       false,
     );
+
+    const store = TestBed.inject(Store);
+    const entity = store.selectSignal(selectApplicationEntities)()['1'];
+    expect(entity?.status).toBe('rejected');
+    expect(entity?.heardBack).toBe(false);
+    expect(entity?.archived).toBe(true);
   });
 
   it('archives the application being edited from the modal and closes it', () => {

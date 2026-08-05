@@ -41,6 +41,10 @@
   <app-undo-toast [message]="undoMessage()" (undo)="onUndo()" />
 }
 
+@if (rejectionPromptMove(); as move) {
+  <app-rejection-response-toast [company]="move.company" (respond)="onRejectionResponse($event)" />
+}
+
 @if (editingApplication(); as application) {
   <app-application-edit-modal
     [application]="application"

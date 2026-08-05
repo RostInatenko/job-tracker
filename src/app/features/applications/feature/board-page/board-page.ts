@@ -3,6 +3,7 @@ import { Store } from '@ngrx/store';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Board } from '../../ui/board/board';
 import { UndoToast } from '../../ui/undo-toast/undo-toast';
+import { RejectionResponseToast } from '../../ui/rejection-response-toast/rejection-response-toast';
 import { QuickAddForm } from '../../ui/quick-add-form/quick-add-form';
 import { ApplicationEditModal } from '../../ui/application-edit-modal/application-edit-modal';
 import { PastePostingModal } from '../../ui/paste-posting-modal/paste-posting-modal';
@@ -17,10 +18,11 @@ import {
 } from '../../data-access/applications.selectors';
 
 const UNDO_WINDOW_MS = 5000;
+const REJECTION_PROMPT_WINDOW_MS = 8000;
 
 @Component({
   selector: 'app-board-page',
-  imports: [Board, UndoToast, QuickAddForm, ApplicationEditModal, PastePostingModal],
+  imports: [Board, UndoToast, RejectionResponseToast, QuickAddForm, ApplicationEditModal, PastePostingModal],
   templateUrl: './board-page.html',
 })
 export class BoardPage {
@@ -47,6 +49,14 @@ export class BoardPage {
     return `${move.company} moved to ${label}`;
   });
 
+  protected readonly rejectionPromptMove = computed(() => {
+    const move = this.lastMove();
+    if (move && move.status === 'rejected' && move.previousStatus !== 'rejected') {
+      return move;
+    }
+    return null;
+  });
+
   constructor() {
     this.store.dispatch(ApplicationsActions.loadApplications());
 
@@ -57,9 +67,10 @@ export class BoardPage {
         return;
       }
 
+      const windowMs = this.rejectionPromptMove() ? REJECTION_PROMPT_WINDOW_MS : UNDO_WINDOW_MS;
       const timer = setTimeout(
         () => this.store.dispatch(ApplicationsActions.lastMoveCleared()),
-        UNDO_WINDOW_MS,
+        windowMs,
       );
       onCleanup(() => clearTimeout(timer));
     });
@@ -96,6 +107,27 @@ export class BoardPage {
     }
 
     this.store.dispatch(ApplicationsActions.undoLastMove({ applicationId: move.applicationId }));
+  }
+
+  protected onRejectionResponse(heardBack: boolean): void {
+    const move = this.rejectionPromptMove();
+
+    if (!move) {
+      return;
+    }
+
+    const application = this.applicationsByStatus().rejected.find(
+      (existing) => existing.id === move.applicationId,
+    );
+
+    if (!application) {
+      return;
+    }
+
+    const updated = { ...application, heardBack };
+    this.store.dispatch(
+      ApplicationsActions.applicationUpdated({ application: updated, previous: application }),
+    );
   }
 
   protected onRetryLoad(): void {
@@ -180,7 +212,15 @@ export class BoardPage {
   }
 
   protected onArchiveStale(application: JobApplication): void {
-    this.archiveApplication(application, true);
+    const updated: JobApplication = {
+      ...application,
+      archived: true,
+      status: 'rejected',
+      heardBack: false,
+    };
+    this.store.dispatch(
+      ApplicationsActions.applicationUpdated({ application: updated, previous: application }),
+    );
   }
 
   private archiveApplication(application: JobApplication, archived: boolean): void {
