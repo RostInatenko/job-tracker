@@ -134,9 +134,9 @@
             <span class="h-2 w-2 shrink-0 rounded-full bg-stage"></span>
             <span class="flex-1 text-sm text-ink">{{ entry.stage }}</span>
             <span class="text-xs text-ink-soft">
-              {{ entry.date }}
+              {{ entry.date | date: 'dd/MM/yyyy' }}
               @if (entry.time) {
-                <span class="text-ink-faint">· {{ entry.date + 'T' + entry.time | date: 'h:mm a' }}</span>
+                <span class="text-ink-faint">· {{ entry.date + 'T' + entry.time | date: 'HH:mm' }}</span>
               }
             </span>
             <button

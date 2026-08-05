@@ -2,6 +2,12 @@ import { TestBed } from '@angular/core/testing';
 import { ApplicationCard } from './application-card';
 import { JobApplication } from '../../data-access/application.model';
 
+function isoDateOffset(days: number): string {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
 describe('ApplicationCard', () => {
   const mockApplication: JobApplication = {
     id: '1',
@@ -92,7 +98,7 @@ describe('ApplicationCard', () => {
     fixture.componentRef.setInput('application', withStage);
     fixture.detectChanges();
 
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('2:30 PM');
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('15/09/2026, 14:30');
   });
 
   it('falls back to a date-only interview stage badge when no time is set', () => {
@@ -105,9 +111,58 @@ describe('ApplicationCard', () => {
     fixture.detectChanges();
 
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
-    expect(text).toContain('Sep 15');
+    expect(text).toContain('15/09/2026');
     expect(text).not.toContain('PM');
     expect(text).not.toContain('AM');
+  });
+
+  it('shows a relative label for an interview stage coming up within two weeks', () => {
+    const withStage: JobApplication = {
+      ...mockApplication,
+      interviewStages: [{ stage: 'Tech interview', date: isoDateOffset(3) }],
+    };
+    const fixture = TestBed.createComponent(ApplicationCard);
+    fixture.componentRef.setInput('application', withStage);
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('in 3 days');
+  });
+
+  it('shows a relative label for a recent past interview stage', () => {
+    const withStage: JobApplication = {
+      ...mockApplication,
+      interviewStages: [{ stage: 'HR screen', date: isoDateOffset(-2) }],
+    };
+    const fixture = TestBed.createComponent(ApplicationCard);
+    fixture.componentRef.setInput('application', withStage);
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('2 days ago');
+  });
+
+  it('appends the time to a relative label when the stage has one', () => {
+    const withStage: JobApplication = {
+      ...mockApplication,
+      interviewStages: [{ stage: 'Tech interview', date: isoDateOffset(3), time: '09:30' }],
+    };
+    const fixture = TestBed.createComponent(ApplicationCard);
+    fixture.componentRef.setInput('application', withStage);
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('in 3 days, 09:30');
+  });
+
+  it('includes the exact date and time in the badge tooltip', () => {
+    const withStage: JobApplication = {
+      ...mockApplication,
+      interviewStages: [{ stage: 'Tech interview', date: isoDateOffset(3), time: '09:30' }],
+    };
+    const fixture = TestBed.createComponent(ApplicationCard);
+    fixture.componentRef.setInput('application', withStage);
+    fixture.detectChanges();
+
+    const badge = (fixture.nativeElement as HTMLElement).querySelector('[title]');
+    expect(badge?.getAttribute('title')).toContain('09:30');
   });
 
   it('does not emit edit when the posting link is clicked', () => {

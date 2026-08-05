@@ -4,6 +4,9 @@ import { InterviewStage, JobApplication, WORK_MODE_OPTIONS } from '../../data-ac
 
 const MAX_VISIBLE_TECH_TAGS = 5;
 const STALE_APPLIED_DAYS = 30;
+const RELATIVE_LABEL_THRESHOLD_DAYS = 14;
+
+const relativeDayFormat = new Intl.RelativeTimeFormat('en-GB', { numeric: 'auto' });
 
 function daysSince(dateIso: string): number {
   const elapsedMs = Date.now() - new Date(dateIso).getTime();
@@ -12,6 +15,29 @@ function daysSince(dateIso: string): number {
 
 function stageSortKey(entry: InterviewStage): string {
   return `${entry.date}T${entry.time ?? '00:00'}`;
+}
+
+function startOfDay(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function daysBetween(from: Date, to: Date): number {
+  const msPerDay = 1000 * 60 * 60 * 24;
+  return Math.round((startOfDay(to).getTime() - startOfDay(from).getTime()) / msPerDay);
+}
+
+function stageRelativeLabel(entry: InterviewStage): string | null {
+  const diffDays = daysBetween(new Date(), new Date(`${entry.date}T00:00`));
+  if (Math.abs(diffDays) > RELATIVE_LABEL_THRESHOLD_DAYS) {
+    return null;
+  }
+  return relativeDayFormat.format(diffDays, 'day');
+}
+
+function stageAbsoluteLabel(entry: InterviewStage): string {
+  const [yyyy, mm, dd] = entry.date.split('-');
+  const datePart = `${dd}/${mm}/${yyyy}`;
+  return entry.time ? `${datePart}, ${entry.time}` : datePart;
 }
 
 @Component({
@@ -49,6 +75,23 @@ export class ApplicationCard {
     }
 
     return [...stages].sort((a, b) => stageSortKey(b).localeCompare(stageSortKey(a)))[0];
+  });
+
+  protected readonly latestInterviewStageLabel = computed(() => {
+    const stage = this.latestInterviewStage();
+    if (!stage) {
+      return null;
+    }
+    const relative = stageRelativeLabel(stage);
+    if (!relative) {
+      return stageAbsoluteLabel(stage);
+    }
+    return stage.time ? `${relative}, ${stage.time}` : relative;
+  });
+
+  protected readonly latestInterviewStageTooltip = computed(() => {
+    const stage = this.latestInterviewStage();
+    return stage ? stageAbsoluteLabel(stage) : null;
   });
 
   protected readonly staleDays = computed(() => {

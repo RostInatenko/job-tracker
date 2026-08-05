@@ -30,13 +30,12 @@
   }
 
   @if (latestInterviewStage(); as stage) {
-    <span class="mt-2 inline-flex items-center gap-1 rounded-full bg-stage-bg px-2.5 py-0.5 text-xs font-medium text-stage">
+    <span
+      [title]="latestInterviewStageTooltip()"
+      class="mt-2 inline-flex items-center gap-1 rounded-full bg-stage-bg px-2.5 py-0.5 text-xs font-medium text-stage"
+    >
       {{ stage.stage }}
-      @if (stage.time) {
-        <span class="font-normal opacity-80">· {{ stage.date + 'T' + stage.time | date: 'MMM d, h:mm a' }}</span>
-      } @else {
-        <span class="font-normal opacity-80">· {{ stage.date | date: 'MMM d' }}</span>
-      }
+      <span class="font-normal opacity-80">· {{ latestInterviewStageLabel() }}</span>
     </span>
   }
 
@@ -56,7 +55,7 @@
   @if (staleDays(); as days) {
     <p class="mt-2 text-xs font-medium text-warn">{{ days }} days, no response</p>
   } @else {
-    <p class="mt-2 text-xs text-ink-faint">{{ application().dateApplied | date: 'mediumDate' }}</p>
+    <p class="mt-2 text-xs text-ink-faint">{{ application().dateApplied | date: 'dd/MM/yyyy' }}</p>
   }
 
   @if (application().notes) {
