@@ -4,6 +4,7 @@ export type WorkMode = 'office' | 'hybrid' | 'remote';
 export interface InterviewStage {
   stage: string;
   date: string;
+  time?: string;
 }
 
 export interface JobApplication {

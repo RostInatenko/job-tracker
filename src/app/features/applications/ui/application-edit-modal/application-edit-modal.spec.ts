@@ -71,6 +71,45 @@ describe('ApplicationEditModal', () => {
     expect(saved?.techStack).toEqual(['Angular', 'RxJS']);
   });
 
+  it('adds an interview stage with an optional time and sorts stages by date and time', () => {
+    const fixture = createComponent();
+    const component = fixture.componentInstance;
+
+    const stageInput = { value: 'Tech interview' } as HTMLInputElement;
+    const dateInput = { value: '2026-07-10' } as HTMLInputElement;
+    const timeInput = { value: '14:30' } as HTMLInputElement;
+    component['onAddStage'](stageInput, dateInput, timeInput);
+
+    expect(component['interviewStages']()).toEqual([
+      { stage: 'Tech interview', date: '2026-07-10', time: '14:30' },
+    ]);
+    expect(stageInput.value).toBe('');
+    expect(dateInput.value).toBe('');
+    expect(timeInput.value).toBe('');
+
+    const earlierSameDay = { value: 'HR screen' } as HTMLInputElement;
+    const earlierDate = { value: '2026-07-10' } as HTMLInputElement;
+    const earlierTime = { value: '09:00' } as HTMLInputElement;
+    component['onAddStage'](earlierSameDay, earlierDate, earlierTime);
+
+    expect(component['sortedInterviewStages']().map((entry) => entry.stage)).toEqual([
+      'HR screen',
+      'Tech interview',
+    ]);
+  });
+
+  it('adds an interview stage without a time when none is provided', () => {
+    const fixture = createComponent();
+    const component = fixture.componentInstance;
+
+    const stageInput = { value: 'Offer call' } as HTMLInputElement;
+    const dateInput = { value: '2026-07-15' } as HTMLInputElement;
+    const timeInput = { value: '' } as HTMLInputElement;
+    component['onAddStage'](stageInput, dateInput, timeInput);
+
+    expect(component['interviewStages']()).toEqual([{ stage: 'Offer call', date: '2026-07-15' }]);
+  });
+
   it('does not emit save when the form is invalid', () => {
     const fixture = createComponent();
     let emitted = false;

@@ -1,6 +1,6 @@
 import { Component, computed, input, output } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { JobApplication, WORK_MODE_OPTIONS } from '../../data-access/application.model';
+import { InterviewStage, JobApplication, WORK_MODE_OPTIONS } from '../../data-access/application.model';
 
 const MAX_VISIBLE_TECH_TAGS = 5;
 const STALE_APPLIED_DAYS = 30;
@@ -8,6 +8,10 @@ const STALE_APPLIED_DAYS = 30;
 function daysSince(dateIso: string): number {
   const elapsedMs = Date.now() - new Date(dateIso).getTime();
   return Math.floor(elapsedMs / (1000 * 60 * 60 * 24));
+}
+
+function stageSortKey(entry: InterviewStage): string {
+  return `${entry.date}T${entry.time ?? '00:00'}`;
 }
 
 @Component({
@@ -39,12 +43,12 @@ export class ApplicationCard {
     const today = new Date().toISOString().slice(0, 10);
     const upcoming = stages
       .filter((entry) => entry.date >= today)
-      .sort((a, b) => a.date.localeCompare(b.date));
+      .sort((a, b) => stageSortKey(a).localeCompare(stageSortKey(b)));
     if (upcoming.length) {
       return upcoming[0];
     }
 
-    return [...stages].sort((a, b) => b.date.localeCompare(a.date))[0];
+    return [...stages].sort((a, b) => stageSortKey(b).localeCompare(stageSortKey(a)))[0];
   });
 
   protected readonly staleDays = computed(() => {

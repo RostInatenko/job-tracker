@@ -1,6 +1,7 @@
 import { Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CdkTrapFocus } from '@angular/cdk/a11y';
+import { DatePipe } from '@angular/common';
 import {
   ApplicationStatus,
   BOARD_COLUMNS,
@@ -10,9 +11,13 @@ import {
   WorkMode,
 } from '../../data-access/application.model';
 
+function stageSortKey(entry: InterviewStage): string {
+  return `${entry.date}T${entry.time ?? '00:00'}`;
+}
+
 @Component({
   selector: 'app-application-edit-modal',
-  imports: [ReactiveFormsModule, CdkTrapFocus],
+  imports: [ReactiveFormsModule, CdkTrapFocus, DatePipe],
   templateUrl: './application-edit-modal.html',
 })
 export class ApplicationEditModal implements OnInit {
@@ -47,7 +52,7 @@ export class ApplicationEditModal implements OnInit {
   protected readonly techStackTags = signal<string[]>([]);
   protected readonly interviewStages = signal<InterviewStage[]>([]);
   protected readonly sortedInterviewStages = computed(() =>
-    [...this.interviewStages()].sort((a, b) => a.date.localeCompare(b.date)),
+    [...this.interviewStages()].sort((a, b) => stageSortKey(a).localeCompare(stageSortKey(b))),
   );
 
   ngOnInit(): void {
@@ -87,15 +92,24 @@ export class ApplicationEditModal implements OnInit {
     this.nonFormDirty = true;
   }
 
-  protected onAddStage(stageInput: HTMLInputElement, dateInput: HTMLInputElement): void {
+  protected onAddStage(
+    stageInput: HTMLInputElement,
+    dateInput: HTMLInputElement,
+    timeInput: HTMLInputElement,
+  ): void {
     const stage = stageInput.value.trim();
     const date = dateInput.value;
+    const time = timeInput.value;
     if (!stage || !date) {
       return;
     }
-    this.interviewStages.update((stages) => [...stages, { stage, date }]);
+    this.interviewStages.update((stages) => [
+      ...stages,
+      { stage, date, ...(time ? { time } : {}) },
+    ]);
     stageInput.value = '';
     dateInput.value = '';
+    timeInput.value = '';
     this.nonFormDirty = true;
   }
 

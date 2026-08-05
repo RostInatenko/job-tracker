@@ -83,6 +83,33 @@ describe('ApplicationCard', () => {
     expect((fixture.nativeElement as HTMLElement).textContent).not.toContain('Remote');
   });
 
+  it('shows the interview stage time when set', () => {
+    const withStage: JobApplication = {
+      ...mockApplication,
+      interviewStages: [{ stage: 'Tech interview', date: '2026-09-15', time: '14:30' }],
+    };
+    const fixture = TestBed.createComponent(ApplicationCard);
+    fixture.componentRef.setInput('application', withStage);
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('2:30 PM');
+  });
+
+  it('falls back to a date-only interview stage badge when no time is set', () => {
+    const withStage: JobApplication = {
+      ...mockApplication,
+      interviewStages: [{ stage: 'Tech interview', date: '2026-09-15' }],
+    };
+    const fixture = TestBed.createComponent(ApplicationCard);
+    fixture.componentRef.setInput('application', withStage);
+    fixture.detectChanges();
+
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('Sep 15');
+    expect(text).not.toContain('PM');
+    expect(text).not.toContain('AM');
+  });
+
   it('does not emit edit when the posting link is clicked', () => {
     const withLink: JobApplication = { ...mockApplication, link: 'https://example.com/job' };
     const fixture = TestBed.createComponent(ApplicationCard);

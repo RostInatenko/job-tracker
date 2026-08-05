@@ -32,7 +32,11 @@
   @if (latestInterviewStage(); as stage) {
     <span class="mt-2 inline-flex items-center gap-1 rounded-full bg-stage-bg px-2.5 py-0.5 text-xs font-medium text-stage">
       {{ stage.stage }}
-      <span class="font-normal opacity-80">· {{ stage.date | date: 'MMM d' }}</span>
+      @if (stage.time) {
+        <span class="font-normal opacity-80">· {{ stage.date + 'T' + stage.time | date: 'MMM d, h:mm a' }}</span>
+      } @else {
+        <span class="font-normal opacity-80">· {{ stage.date | date: 'MMM d' }}</span>
+      }
     </span>
   }
 
