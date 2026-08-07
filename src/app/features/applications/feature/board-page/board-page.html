@@ -1,9 +1,9 @@
 <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-  <div class="flex flex-wrap items-center gap-2">
+  <div class="flex flex-wrap items-center gap-1">
     <button
       type="button"
       (click)="onOpenCreate()"
-      class="shrink-0 rounded-md bg-btn-bg px-3 py-2 text-sm font-medium text-btn-text hover:opacity-90"
+      class="shrink-0 rounded-md border border-border-strong bg-surface-sunken px-3 py-2 text-sm font-medium text-ink hover:opacity-90"
     >
       Add application
     </button>
@@ -15,7 +15,7 @@
       Add from job posting
     </button>
   </div>
-  <div class="relative w-full shrink-0 sm:w-72">
+  <div class="relative w-full shrink-0 sm:w-[calc((100%-3.75rem)/4)]">
     <svg
       class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint"
       width="14"
@@ -37,7 +37,7 @@
       (input)="onSearchInput(searchInput.value)"
       placeholder="Search by company, role, or location"
       aria-label="Search applications"
-      class="w-full rounded-md border border-border-strong bg-surface py-2 pl-9 pr-3 text-sm text-ink"
+      class="w-full rounded-md border border-border-strong bg-surface-sunken py-2 pl-9 pr-3 text-sm text-ink"
     />
   </div>
 </div>
