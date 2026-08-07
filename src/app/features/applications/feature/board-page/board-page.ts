@@ -4,7 +4,6 @@ import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Board } from '../../ui/board/board';
 import { UndoToast } from '../../ui/undo-toast/undo-toast';
 import { RejectionResponseToast } from '../../ui/rejection-response-toast/rejection-response-toast';
-import { QuickAddForm } from '../../ui/quick-add-form/quick-add-form';
 import { ApplicationEditModal } from '../../ui/application-edit-modal/application-edit-modal';
 import { PastePostingModal } from '../../ui/paste-posting-modal/paste-posting-modal';
 import { ApplicationStatus, BOARD_COLUMNS, JobApplication } from '../../data-access/application.model';
@@ -22,7 +21,7 @@ const REJECTION_PROMPT_WINDOW_MS = 8000;
 
 @Component({
   selector: 'app-board-page',
-  imports: [Board, UndoToast, RejectionResponseToast, QuickAddForm, ApplicationEditModal, PastePostingModal],
+  imports: [Board, UndoToast, RejectionResponseToast, ApplicationEditModal, PastePostingModal],
   templateUrl: './board-page.html',
 })
 export class BoardPage {
@@ -35,6 +34,7 @@ export class BoardPage {
   protected readonly error = this.store.selectSignal(selectError);
   protected readonly mutationError = this.store.selectSignal(selectMutationError);
   protected readonly editingApplication = signal<JobApplication | null>(null);
+  protected readonly creatingApplication = signal(false);
   protected readonly pastingPosting = signal(false);
   private editTriggerElement: HTMLElement | null = null;
 
@@ -138,18 +138,17 @@ export class BoardPage {
     this.store.dispatch(ApplicationsActions.mutationErrorCleared());
   }
 
-  protected onQuickAdd({ company, role }: { company: string; role: string }): void {
-    this.store.dispatch(
-      ApplicationsActions.applicationAdded({
-        application: {
-          id: crypto.randomUUID(),
-          company,
-          role,
-          status: 'applied',
-          dateApplied: new Date().toISOString().slice(0, 10),
-        },
-      }),
-    );
+  protected onOpenCreate(): void {
+    this.creatingApplication.set(true);
+  }
+
+  protected onCloseCreate(): void {
+    this.creatingApplication.set(false);
+  }
+
+  protected onSaveCreate(application: JobApplication): void {
+    this.store.dispatch(ApplicationsActions.applicationAdded({ application }));
+    this.creatingApplication.set(false);
   }
 
   protected onOpenPastePosting(): void {

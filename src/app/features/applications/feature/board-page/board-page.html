@@ -1,5 +1,11 @@
 <div class="mb-4 flex items-center gap-3">
-  <app-quick-add-form (added)="onQuickAdd($event)" />
+  <button
+    type="button"
+    (click)="onOpenCreate()"
+    class="rounded-md bg-btn-bg px-3 py-2 text-sm font-medium text-btn-text hover:opacity-90"
+  >
+    Add application
+  </button>
   <button
     type="button"
     (click)="onOpenPastePosting()"
@@ -57,4 +63,12 @@
 
 @if (pastingPosting()) {
   <app-paste-posting-modal (added)="onPastedPosting($event)" (close)="onClosePastePosting()" />
+}
+
+@if (creatingApplication()) {
+  <app-application-edit-modal
+    mode="create"
+    (save)="onSaveCreate($event)"
+    (close)="onCloseCreate()"
+  />
 }

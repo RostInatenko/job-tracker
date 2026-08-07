@@ -5,7 +5,6 @@ import { Store, provideState, provideStore } from '@ngrx/store';
 import { Board } from '../../ui/board/board';
 import { UndoToast } from '../../ui/undo-toast/undo-toast';
 import { RejectionResponseToast } from '../../ui/rejection-response-toast/rejection-response-toast';
-import { QuickAddForm } from '../../ui/quick-add-form/quick-add-form';
 import { ApplicationEditModal } from '../../ui/application-edit-modal/application-edit-modal';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { JobApplication } from '../../data-access/application.model';
@@ -188,11 +187,26 @@ describe('BoardPage', () => {
     expect(fixture.debugElement.query(By.directive(RejectionResponseToast))).toBeNull();
   });
 
-  it('adds a new application from the quick-add form', () => {
+  it('adds a new application from the create modal', () => {
     const fixture = createLoadedFixture();
 
-    const quickAddDebugEl = fixture.debugElement.query(By.directive(QuickAddForm));
-    quickAddDebugEl.triggerEventHandler('added', { company: 'Vantage Health', role: 'Frontend Engineer' });
+    const addButton = fixture.debugElement
+      .queryAll(By.css('button'))
+      .find((button) => button.nativeElement.textContent.trim() === 'Add application');
+    addButton?.nativeElement.click();
+    fixture.detectChanges();
+
+    const modalDebugEl = fixture.debugElement.query(By.directive(ApplicationEditModal));
+    expect(modalDebugEl).toBeTruthy();
+
+    const modal = modalDebugEl.componentInstance as ApplicationEditModal;
+    modal.save.emit({
+      id: crypto.randomUUID(),
+      company: 'Vantage Health',
+      role: 'Frontend Engineer',
+      status: 'applied',
+      dateApplied: '2026-07-01',
+    });
     fixture.detectChanges();
 
     const boardDebugEl = fixture.debugElement.query(By.directive(Board));
@@ -204,6 +218,7 @@ describe('BoardPage', () => {
           (application) => application.company === 'Vantage Health' && application.role === 'Frontend Engineer',
         ),
     ).toBe(true);
+    expect(fixture.debugElement.query(By.directive(ApplicationEditModal))).toBeNull();
   });
 
   it('opens the edit modal for a clicked card and saves changes', () => {

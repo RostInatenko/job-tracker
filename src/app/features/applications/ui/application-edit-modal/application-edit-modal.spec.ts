@@ -43,11 +43,42 @@ describe('ApplicationEditModal', () => {
       dateApplied: '2026-06-28',
       salary: '$90,000 - $110,000',
       workMode: '',
+      location: '',
       heardBack: '',
       notes: 'Referred by a friend',
       link: 'https://example.com/jobs/nordic-fintech',
     });
     expect(fixture.componentInstance['techStackTags']()).toEqual(['Angular', 'RxJS']);
+  });
+
+  it('defaults to today and generates a fresh id when creating without an existing application', () => {
+    const fixture = TestBed.createComponent(ApplicationEditModal);
+    fixture.componentRef.setInput('mode', 'create');
+    fixture.detectChanges();
+
+    const component = fixture.componentInstance;
+    expect(component['form'].controls.dateApplied.value).toBe(new Date().toISOString().slice(0, 10));
+
+    let saved: JobApplication | undefined;
+    component.save.subscribe((value) => (saved = value));
+    component['form'].patchValue({ company: 'New Co', role: 'Engineer' });
+    component['onSave'](emptyInput(), emptyInput(), emptyInput());
+
+    expect(saved?.id).toBeTruthy();
+    expect(saved?.company).toBe('New Co');
+  });
+
+  it('hides delete and archive controls when creating a new application', () => {
+    const fixture = TestBed.createComponent(ApplicationEditModal);
+    fixture.componentRef.setInput('mode', 'create');
+    fixture.detectChanges();
+
+    const buttonLabels = Array.from(
+      (fixture.nativeElement as HTMLElement).querySelectorAll('button'),
+    ).map((button) => button.textContent?.trim());
+
+    expect(buttonLabels).not.toContain('Delete');
+    expect(buttonLabels).not.toContain('Archive');
   });
 
   it('adds and removes tech stack tags', () => {

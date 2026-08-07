@@ -65,7 +65,9 @@
     </div>
   }
   <div class="overflow-y-auto p-6">
-    <h2 id="edit-modal-heading" class="mb-4 text-lg font-semibold text-ink">Edit application</h2>
+    <h2 id="edit-modal-heading" class="mb-4 text-lg font-semibold text-ink">
+      {{ mode() === 'create' ? 'Add application' : 'Edit application' }}
+    </h2>
 
     <label class="mb-3 block text-sm">
       <span class="mb-1 block font-medium text-ink">Company</span>
@@ -267,41 +269,45 @@
   </div>
 
     <div class="flex items-center justify-between border-t border-border p-6 pt-4">
-      @if (confirmingDelete()) {
-        <div class="flex items-center gap-2 text-sm">
-          <span class="text-ink">Delete this application?</span>
-          <button
-            type="button"
-            (click)="onDeleteConfirm()"
-            class="rounded-md bg-danger px-3 py-1.5 font-medium text-white hover:opacity-90"
-          >
-            Confirm
-          </button>
-          <button
-            type="button"
-            (click)="onDeleteCancel()"
-            class="rounded-md px-3 py-1.5 text-ink-soft hover:bg-surface-sunken"
-          >
-            Cancel
-          </button>
-        </div>
+      @if (mode() === 'edit') {
+        @if (confirmingDelete()) {
+          <div class="flex items-center gap-2 text-sm">
+            <span class="text-ink">Delete this application?</span>
+            <button
+              type="button"
+              (click)="onDeleteConfirm()"
+              class="rounded-md bg-danger px-3 py-1.5 font-medium text-white hover:opacity-90"
+            >
+              Confirm
+            </button>
+            <button
+              type="button"
+              (click)="onDeleteCancel()"
+              class="rounded-md px-3 py-1.5 text-ink-soft hover:bg-surface-sunken"
+            >
+              Cancel
+            </button>
+          </div>
+        } @else {
+          <div class="flex gap-2">
+            <button
+              type="button"
+              (click)="onDeleteClick()"
+              class="rounded-md px-3 py-2 text-sm font-medium text-danger hover:bg-danger-bg"
+            >
+              Delete
+            </button>
+            <button
+              type="button"
+              (click)="onArchiveToggle()"
+              class="rounded-md px-3 py-2 text-sm font-medium text-ink-soft hover:bg-surface-sunken"
+            >
+              {{ isArchived() ? 'Unarchive' : 'Archive' }}
+            </button>
+          </div>
+        }
       } @else {
-        <div class="flex gap-2">
-          <button
-            type="button"
-            (click)="onDeleteClick()"
-            class="rounded-md px-3 py-2 text-sm font-medium text-danger hover:bg-danger-bg"
-          >
-            Delete
-          </button>
-          <button
-            type="button"
-            (click)="onArchiveToggle()"
-            class="rounded-md px-3 py-2 text-sm font-medium text-ink-soft hover:bg-surface-sunken"
-          >
-            {{ isArchived() ? 'Unarchive' : 'Archive' }}
-          </button>
-        </div>
+        <span></span>
       }
       <div class="flex gap-2">
         <button
@@ -315,7 +321,7 @@
           type="submit"
           class="rounded-md bg-btn-bg px-3 py-2 text-sm text-btn-text hover:opacity-90"
         >
-          Save
+          {{ mode() === 'create' ? 'Add application' : 'Save' }}
         </button>
       </div>
     </div>

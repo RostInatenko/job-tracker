@@ -24,7 +24,8 @@ function stageSortKey(entry: InterviewStage): string {
 export class ApplicationEditModal implements OnInit {
   private readonly formBuilder = inject(FormBuilder);
 
-  application = input.required<JobApplication>();
+  mode = input<'create' | 'edit'>('edit');
+  application = input<JobApplication | null>(null);
   save = output<JobApplication>();
   delete = output<void>();
   close = output<void>();
@@ -50,7 +51,7 @@ export class ApplicationEditModal implements OnInit {
       'applied',
       Validators.required,
     ),
-    dateApplied: ['', Validators.required],
+    dateApplied: [new Date().toISOString().slice(0, 10), Validators.required],
     salary: [''],
     workMode: this.formBuilder.nonNullable.control<WorkMode | ''>(''),
     location: [''],
@@ -63,7 +64,7 @@ export class ApplicationEditModal implements OnInit {
     initialValue: this.form.controls.status.value,
   });
 
-  protected readonly isArchived = computed(() => this.application().archived ?? false);
+  protected readonly isArchived = computed(() => this.application()?.archived ?? false);
 
   protected readonly techStackTags = signal<string[]>([]);
   protected readonly interviewStages = signal<InterviewStage[]>([]);
@@ -73,6 +74,9 @@ export class ApplicationEditModal implements OnInit {
 
   ngOnInit(): void {
     const application = this.application();
+    if (!application) {
+      return;
+    }
     this.form.patchValue({
       ...application,
       heardBack:
@@ -200,6 +204,7 @@ export class ApplicationEditModal implements OnInit {
     const value = this.form.getRawValue();
     this.save.emit({
       ...this.application(),
+      id: this.application()?.id ?? crypto.randomUUID(),
       company: value.company,
       role: value.role,
       status: value.status,
