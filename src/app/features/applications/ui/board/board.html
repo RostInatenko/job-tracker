@@ -1,6 +1,7 @@
-<div cdkDropListGroup class="flex gap-6 overflow-x-auto pb-4">
+<div cdkDropListGroup class="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 sm:gap-6">
   @for (column of columns(); track column.status) {
     <app-board-column
+      class="w-[85vw] shrink-0 snap-start sm:w-auto sm:min-w-72 sm:max-w-xs sm:flex-1"
       [columnId]="column.status"
       [label]="column.label"
       [connectedTo]="columnIds()"
