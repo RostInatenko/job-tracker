@@ -75,10 +75,13 @@ export const applicationsReducer = createReducer(
     ...state,
     lastMove: null,
   })),
-  on(ApplicationsActions.applicationAdded, (state, { application }) => ({
-    ...applicationsAdapter.addOne(application, state),
-    lastMove: null,
-  })),
+  on(ApplicationsActions.applicationAdded, (state, { application }) => {
+    const applications = applicationsAdapter.getSelectors().selectAll(state);
+    return {
+      ...applicationsAdapter.setAll([application, ...applications], state),
+      lastMove: null,
+    };
+  }),
   on(ApplicationsActions.applicationAddFailed, (state, { application, error }) => ({
     ...applicationsAdapter.removeOne(application.id, state),
     mutationError: error,

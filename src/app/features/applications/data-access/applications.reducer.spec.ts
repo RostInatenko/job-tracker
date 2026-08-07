@@ -179,6 +179,24 @@ describe('applicationsReducer', () => {
     expect(nextState.lastMove).toBeNull();
   });
 
+  it('puts a newly added application at the front of the list', () => {
+    const state = createState([applied, interview]);
+    const offer: JobApplication = {
+      id: '4',
+      company: 'BrightPath Media',
+      role: 'Frontend Developer',
+      status: 'offer',
+      dateApplied: '2026-07-10',
+    };
+
+    const nextState = applicationsReducer(
+      state,
+      ApplicationsActions.applicationAdded({ application: offer }),
+    );
+
+    expect(applicationsAdapter.getSelectors().selectAll(nextState)[0]).toEqual(offer);
+  });
+
   it('removes the application and sets a mutation error when persisting an add fails', () => {
     const state = createState([applied]);
     const offer: JobApplication = {
