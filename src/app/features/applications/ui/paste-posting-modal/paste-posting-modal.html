@@ -11,7 +11,7 @@
     role="dialog"
     aria-modal="true"
     aria-labelledby="paste-posting-heading"
-    class="relative flex max-h-[85vh] w-full max-w-md flex-col overflow-hidden rounded-lg border border-border bg-surface"
+    class="relative flex max-h-[85vh] w-full max-w-xl flex-col overflow-hidden rounded-lg border border-border bg-surface"
   >
     @if (confirmingClose()) {
       <div class="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-black/50 p-4">
@@ -112,64 +112,70 @@
               Add from job posting
             </h2>
 
-            <label class="mb-3 block text-sm">
-              <span class="mb-1 block font-medium text-ink">Company</span>
-              <input
-                formControlName="company"
-                class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
-              />
-            </label>
+            <div class="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <label class="block text-sm">
+                <span class="mb-1 block font-medium text-ink">Company</span>
+                <input
+                  formControlName="company"
+                  class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
+                />
+              </label>
 
-            <label class="mb-3 block text-sm">
-              <span class="mb-1 block font-medium text-ink">Role</span>
-              <input
-                formControlName="role"
-                class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
-              />
-            </label>
+              <label class="block text-sm">
+                <span class="mb-1 block font-medium text-ink">Role</span>
+                <input
+                  formControlName="role"
+                  class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
+                />
+              </label>
+            </div>
 
-            <label class="mb-3 block text-sm">
-              <span class="mb-1 block font-medium text-ink">Status</span>
-              <select
-                formControlName="status"
-                class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
-              >
-                @for (column of columns; track column.status) {
-                  <option [value]="column.status">{{ column.label }}</option>
-                }
-              </select>
-            </label>
+            <div class="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <label class="block text-sm">
+                <span class="mb-1 block font-medium text-ink">Status</span>
+                <select
+                  formControlName="status"
+                  class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
+                >
+                  @for (column of columns; track column.status) {
+                    <option [value]="column.status">{{ column.label }}</option>
+                  }
+                </select>
+              </label>
 
-            <label class="mb-3 block text-sm">
-              <span class="mb-1 block font-medium text-ink">Work mode</span>
-              <select
-                formControlName="workMode"
-                class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
-              >
-                <option value="">Not specified</option>
-                @for (option of workModeOptions; track option.value) {
-                  <option [value]="option.value">{{ option.label }}</option>
-                }
-              </select>
-            </label>
+              <label class="block text-sm">
+                <span class="mb-1 block font-medium text-ink">Work mode</span>
+                <select
+                  formControlName="workMode"
+                  class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
+                >
+                  <option value="">Not specified</option>
+                  @for (option of workModeOptions; track option.value) {
+                    <option [value]="option.value">{{ option.label }}</option>
+                  }
+                </select>
+              </label>
+            </div>
 
-            <label class="mb-3 block text-sm">
-              <span class="mb-1 block font-medium text-ink">Location</span>
-              <input
-                formControlName="location"
-                placeholder="e.g. Berlin"
-                class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
-              />
-            </label>
+            <div class="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <label class="block text-sm">
+                <span class="mb-1 block font-medium text-ink">Location</span>
+                <input
+                  formControlName="location"
+                  placeholder="e.g. Berlin"
+                  class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
+                />
+              </label>
 
-            <label class="mb-3 block text-sm">
-              <span class="mb-1 block font-medium text-ink">Date applied</span>
-              <input
-                type="date"
-                formControlName="dateApplied"
-                class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
-              />
-            </label>
+              <label class="block text-sm">
+                <span class="mb-1 block font-medium text-ink">Date applied</span>
+                <input
+                  type="date"
+                  formControlName="dateApplied"
+                  class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
+                />
+              </label>
+            </div>
 
             <label class="mb-3 block text-sm">
               <span class="mb-1 block font-medium text-ink">Tech stack</span>
@@ -180,23 +186,25 @@
               />
             </label>
 
-            <label class="mb-3 block text-sm">
-              <span class="mb-1 block font-medium text-ink">Salary</span>
-              <input
-                formControlName="salary"
-                class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
-              />
-            </label>
+            <div class="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <label class="block text-sm">
+                <span class="mb-1 block font-medium text-ink">Salary</span>
+                <input
+                  formControlName="salary"
+                  class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
+                />
+              </label>
+
+              <label class="block text-sm">
+                <span class="mb-1 block font-medium text-ink">Job link</span>
+                <input
+                  formControlName="link"
+                  class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
+                />
+              </label>
+            </div>
 
             <label class="mb-0 block text-sm">
-              <span class="mb-1 block font-medium text-ink">Job link</span>
-              <input
-                formControlName="link"
-                class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
-              />
-            </label>
-
-            <label class="mb-0 mt-3 block text-sm">
               <span class="mb-1 block font-medium text-ink">Notes</span>
               <textarea
                 formControlName="notes"
