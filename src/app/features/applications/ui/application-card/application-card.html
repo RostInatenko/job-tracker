@@ -23,13 +23,15 @@
   </div>
   <p class="text-sm text-ink-soft">{{ application().role }}</p>
 
-  @if (application().salary || workModeLabel()) {
+  @if (application().salary || workModeLabel() || application().location) {
     <div class="mt-1 flex flex-wrap items-center gap-2">
       @if (application().salary) {
         <p class="text-xs font-medium text-money">{{ application().salary }}</p>
       }
-      @if (workModeLabel(); as mode) {
-        <span class="rounded-full bg-surface-sunken px-2 py-0.5 text-xs text-ink-soft">{{ mode }}</span>
+      @if (workModeLabel() || application().location) {
+        <span class="rounded-full bg-surface-sunken px-2 py-0.5 text-xs text-ink-soft">
+          {{ workModeLabel() }}{{ workModeLabel() && application().location ? ' · ' : '' }}{{ application().location }}
+        </span>
       }
     </div>
   }

@@ -40,6 +40,7 @@ export class PastePostingModal {
     techStack: [''],
     salary: [''],
     workMode: this.formBuilder.nonNullable.control<WorkMode | ''>(''),
+    location: [''],
     notes: [''],
     link: [''],
   });
@@ -90,6 +91,7 @@ export class PastePostingModal {
       link: value.link || undefined,
       salary: value.salary || undefined,
       workMode: value.workMode || undefined,
+      location: value.location || undefined,
       techStack: value.techStack
         .split(',')
         .map((item) => item.trim())

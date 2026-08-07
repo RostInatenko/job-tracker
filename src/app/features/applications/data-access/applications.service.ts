@@ -21,6 +21,7 @@ interface ApplicationRow {
   salary: string | null;
   interviewStages: InterviewStage[];
   workMode: string | null;
+  location: string | null;
   archived: boolean;
   heardBack: boolean | null;
 }
@@ -38,6 +39,7 @@ function toApplication(row: ApplicationRow): JobApplication {
     salary: row.salary ?? undefined,
     interviewStages: row.interviewStages,
     workMode: (row.workMode?.toLowerCase() as JobApplication['workMode']) ?? undefined,
+    location: row.location ?? undefined,
     archived: row.archived,
     heardBack: row.heardBack ?? undefined,
   };
@@ -56,6 +58,7 @@ function toCreateBody(application: JobApplication) {
     salary: application.salary ?? null,
     interviewStages: application.interviewStages ?? [],
     workMode: application.workMode?.toUpperCase() ?? null,
+    location: application.location ?? null,
     archived: application.archived ?? false,
     heardBack: application.heardBack ?? null,
   };
@@ -94,6 +97,7 @@ function toUpdateBody(application: JobApplication) {
     salary: application.salary ?? null,
     interviewStages: application.interviewStages ?? [],
     workMode: application.workMode?.toUpperCase() ?? null,
+    location: application.location ?? null,
     archived: application.archived ?? false,
     heardBack: application.heardBack ?? null,
   };

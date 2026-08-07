@@ -19,6 +19,7 @@ export interface JobApplication {
   salary?: string;
   interviewStages?: InterviewStage[];
   workMode?: WorkMode;
+  location?: string;
   archived?: boolean;
   heardBack?: boolean;
 }
