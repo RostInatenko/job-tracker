@@ -45,7 +45,7 @@ describe('ApplicationsEffects', () => {
 
   it('maps a successful load to loadApplicationsSuccess', async () => {
     applicationsService.getAll.mockReturnValue(of([application]));
-    actions$ = of(ApplicationsActions.loadApplications());
+    actions$ = of(ApplicationsActions.loadApplications({}));
 
     const { effects } = createEffects();
     const result = await firstValueFrom(effects.loadApplications$);
@@ -57,12 +57,22 @@ describe('ApplicationsEffects', () => {
 
   it('maps a failed load to loadApplicationsFailure', async () => {
     applicationsService.getAll.mockReturnValue(throwError(() => new Error('network error')));
-    actions$ = of(ApplicationsActions.loadApplications());
+    actions$ = of(ApplicationsActions.loadApplications({}));
 
     const { effects } = createEffects();
     const result = await firstValueFrom(effects.loadApplications$);
 
     expect(result).toEqual(ApplicationsActions.loadApplicationsFailure({ error: 'network error' }));
+  });
+
+  it('passes the search term through to the service', async () => {
+    applicationsService.getAll.mockReturnValue(of([application]));
+    actions$ = of(ApplicationsActions.loadApplications({ search: 'fintech' }));
+
+    const { effects } = createEffects();
+    await firstValueFrom(effects.loadApplications$);
+
+    expect(applicationsService.getAll).toHaveBeenCalledWith('fintech');
   });
 
   it('maps a successful add to applicationAddSucceeded', async () => {

@@ -293,7 +293,7 @@ describe('applicationsReducer', () => {
   it('sets loading and clears any previous error when loading starts', () => {
     const state = { ...createState([]), error: 'a previous failure' };
 
-    const nextState = applicationsReducer(state, ApplicationsActions.loadApplications());
+    const nextState = applicationsReducer(state, ApplicationsActions.loadApplications({}));
 
     expect(nextState.loading).toBe(true);
     expect(nextState.error).toBeNull();

@@ -24,8 +24,8 @@ export class ApplicationsEffects {
   loadApplications$ = createEffect(() =>
     this.actions$.pipe(
       ofType(ApplicationsActions.loadApplications),
-      switchMap(() =>
-        this.applicationsService.getAll().pipe(
+      switchMap(({ search }) =>
+        this.applicationsService.getAll(search).pipe(
           map((applications) => ApplicationsActions.loadApplicationsSuccess({ applications })),
           catchError((error: unknown) =>
             of(ApplicationsActions.loadApplicationsFailure({ error: toErrorMessage(error) })),

@@ -20,7 +20,7 @@ export const ApplicationsActions = createActionGroup({
     'Application Deleted': props<{ application: JobApplication }>(),
     'Application Delete Succeeded': emptyProps(),
     'Application Delete Failed': props<{ application: JobApplication; error: string }>(),
-    'Load Applications': emptyProps(),
+    'Load Applications': props<{ search?: string }>(),
     'Load Applications Success': props<{ applications: JobApplication[] }>(),
     'Load Applications Failure': props<{ error: string }>(),
     'Mutation Error Cleared': emptyProps(),

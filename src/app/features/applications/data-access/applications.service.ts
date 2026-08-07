@@ -108,9 +108,9 @@ export class ApplicationsService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/applications`;
 
-  getAll(): Observable<JobApplication[]> {
+  getAll(search?: string): Observable<JobApplication[]> {
     return this.http
-      .get<ApplicationRow[]>(this.baseUrl)
+      .get<ApplicationRow[]>(this.baseUrl, { params: search ? { search } : {} })
       .pipe(map((rows) => rows.map(toApplication)));
   }
 

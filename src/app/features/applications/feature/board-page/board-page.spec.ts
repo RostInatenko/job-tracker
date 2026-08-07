@@ -329,6 +329,32 @@ describe('BoardPage', () => {
     expect(fixture.debugElement.query(By.directive(ApplicationEditModal))).toBeNull();
   });
 
+  it('debounces search input and dispatches loadApplications with the search term', () => {
+    vi.useFakeTimers();
+    try {
+      const fixture = createLoadedFixture();
+      const store = TestBed.inject(Store);
+      const dispatchSpy = vi.spyOn(store, 'dispatch');
+
+      const searchInput = fixture.debugElement.query(By.css('input[type="search"]'))
+        .nativeElement as HTMLInputElement;
+      searchInput.value = 'fintech';
+      searchInput.dispatchEvent(new Event('input'));
+
+      expect(dispatchSpy).not.toHaveBeenCalledWith(
+        ApplicationsActions.loadApplications({ search: 'fintech' }),
+      );
+
+      vi.advanceTimersByTime(300);
+
+      expect(dispatchSpy).toHaveBeenCalledWith(
+        ApplicationsActions.loadApplications({ search: 'fintech' }),
+      );
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('shows a dismissable mutation error banner without hiding the board', () => {
     const fixture = createLoadedFixture();
 

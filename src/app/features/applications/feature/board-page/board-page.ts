@@ -18,6 +18,7 @@ import {
 
 const UNDO_WINDOW_MS = 5000;
 const REJECTION_PROMPT_WINDOW_MS = 8000;
+const SEARCH_DEBOUNCE_MS = 300;
 
 @Component({
   selector: 'app-board-page',
@@ -36,7 +37,9 @@ export class BoardPage {
   protected readonly editingApplication = signal<JobApplication | null>(null);
   protected readonly creatingApplication = signal(false);
   protected readonly pastingPosting = signal(false);
+  protected readonly searchTerm = signal('');
   private editTriggerElement: HTMLElement | null = null;
+  private searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   protected readonly undoMessage = computed(() => {
     const move = this.lastMove();
@@ -58,7 +61,7 @@ export class BoardPage {
   });
 
   constructor() {
-    this.store.dispatch(ApplicationsActions.loadApplications());
+    this.store.dispatch(ApplicationsActions.loadApplications({}));
 
     effect((onCleanup) => {
       const move = this.lastMove();
@@ -131,7 +134,22 @@ export class BoardPage {
   }
 
   protected onRetryLoad(): void {
-    this.store.dispatch(ApplicationsActions.loadApplications());
+    this.store.dispatch(ApplicationsActions.loadApplications({ search: this.currentSearch() }));
+  }
+
+  protected onSearchInput(value: string): void {
+    this.searchTerm.set(value);
+
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+    }
+    this.searchDebounceTimer = setTimeout(() => {
+      this.store.dispatch(ApplicationsActions.loadApplications({ search: this.currentSearch() }));
+    }, SEARCH_DEBOUNCE_MS);
+  }
+
+  private currentSearch(): string | undefined {
+    return this.searchTerm().trim() || undefined;
   }
 
   protected onDismissMutationError(): void {
