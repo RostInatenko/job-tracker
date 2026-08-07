@@ -1,17 +1,26 @@
 <div class="flex min-h-screen flex-col bg-page">
   <header class="border-b border-border bg-surface">
     <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-      <h1 class="text-xl font-semibold text-ink">Job Application Tracker</h1>
+      <a
+        routerLink="/"
+        routerLinkActive="bg-surface-sunken"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="rounded-md px-2 py-1 text-xl font-semibold text-ink hover:bg-surface-sunken"
+      >
+        Job Application Tracker
+      </a>
       <div class="flex items-center gap-2">
         @if (isLoggedIn()) {
           <a
             routerLink="/stats"
+            routerLinkActive="bg-surface-sunken text-ink"
             class="rounded-md px-3 py-2 text-sm font-medium text-ink-soft hover:bg-surface-sunken"
           >
             Stats
           </a>
           <a
             routerLink="/archived"
+            routerLinkActive="bg-surface-sunken text-ink"
             class="rounded-md px-3 py-2 text-sm font-medium text-ink-soft hover:bg-surface-sunken"
           >
             Archived
