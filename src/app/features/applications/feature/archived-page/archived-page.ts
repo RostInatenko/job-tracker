@@ -1,5 +1,4 @@
 import { Component, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { ApplicationCard } from '../../ui/application-card/application-card';
 import { ApplicationEditModal } from '../../ui/application-edit-modal/application-edit-modal';
 import { ApplicationsService } from '../../data-access/applications.service';
@@ -7,7 +6,7 @@ import { JobApplication } from '../../data-access/application.model';
 
 @Component({
   selector: 'app-archived-page',
-  imports: [RouterLink, ApplicationCard, ApplicationEditModal],
+  imports: [ApplicationCard, ApplicationEditModal],
   templateUrl: './archived-page.html',
 })
 export class ArchivedPage {

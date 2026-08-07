@@ -1,5 +1,4 @@
 import { Component, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { ApplicationsService } from '../../data-access/applications.service';
 import {
   ApplicationStats,
@@ -9,7 +8,7 @@ import {
 
 @Component({
   selector: 'app-stats-page',
-  imports: [RouterLink],
+  imports: [],
   templateUrl: './stats-page.html',
 })
 export class StatsPage {
