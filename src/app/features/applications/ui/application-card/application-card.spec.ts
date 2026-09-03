@@ -11,6 +11,15 @@ function isoDateOffset(days: number): string {
   return `${year}-${month}-${day}`;
 }
 
+// Mirrors the component's own stageAbsoluteLabel formatting (DD/MM/YYYY),
+// so tests can assert against a computed future date instead of a hardcoded
+// one that silently becomes "within the relative-label window" as real time
+// passes.
+function formatDMY(dateIso: string): string {
+  const [year, month, day] = dateIso.split('-');
+  return `${day}/${month}/${year}`;
+}
+
 describe('ApplicationCard', () => {
   const mockApplication: JobApplication = {
     id: '1',
@@ -93,28 +102,32 @@ describe('ApplicationCard', () => {
   });
 
   it('shows the interview stage time when set', () => {
+    const date = isoDateOffset(20);
     const withStage: JobApplication = {
       ...mockApplication,
-      interviewStages: [{ stage: 'Tech interview', date: '2026-09-15', time: '14:30' }],
+      interviewStages: [{ stage: 'Tech interview', date, time: '14:30' }],
     };
     const fixture = TestBed.createComponent(ApplicationCard);
     fixture.componentRef.setInput('application', withStage);
     fixture.detectChanges();
 
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('15/09/2026, 14:30');
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain(
+      `${formatDMY(date)}, 14:30`,
+    );
   });
 
   it('falls back to a date-only interview stage badge when no time is set', () => {
+    const date = isoDateOffset(20);
     const withStage: JobApplication = {
       ...mockApplication,
-      interviewStages: [{ stage: 'Tech interview', date: '2026-09-15' }],
+      interviewStages: [{ stage: 'Tech interview', date }],
     };
     const fixture = TestBed.createComponent(ApplicationCard);
     fixture.componentRef.setInput('application', withStage);
     fixture.detectChanges();
 
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
-    expect(text).toContain('15/09/2026');
+    expect(text).toContain(formatDMY(date));
     expect(text).not.toContain('PM');
     expect(text).not.toContain('AM');
   });
