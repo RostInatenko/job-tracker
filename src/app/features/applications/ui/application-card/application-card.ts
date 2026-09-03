@@ -4,7 +4,7 @@ import { InterviewStage, JobApplication, WORK_MODE_OPTIONS } from '../../data-ac
 import { GhostIcon } from '../ghost-icon/ghost-icon';
 
 const MAX_VISIBLE_TECH_TAGS = 5;
-const STALE_APPLIED_DAYS = 30;
+const STALE_APPLIED_DAYS = 14;
 const RELATIVE_LABEL_THRESHOLD_DAYS = 14;
 
 const relativeDayFormat = new Intl.RelativeTimeFormat('en-GB', { numeric: 'auto' });
