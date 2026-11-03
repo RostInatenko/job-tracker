@@ -221,6 +221,17 @@ describe('ApplicationCard', () => {
     expect(archiveButton).toBeUndefined();
   });
 
+  it('does not mark an archived application as stale', () => {
+    const archivedStale: JobApplication = { ...mockApplication, archived: true };
+    const fixture = TestBed.createComponent(ApplicationCard);
+    fixture.componentRef.setInput('application', archivedStale);
+    fixture.detectChanges();
+
+    const card = fixture.nativeElement as HTMLElement;
+    expect(card.textContent).not.toContain('no response');
+    expect(card.querySelector('article')?.className).not.toContain('bg-warn-bg');
+  });
+
   it('shows a ghost icon on a rejected application with no response', () => {
     const ghosted: JobApplication = { ...mockApplication, status: 'rejected', heardBack: false };
     const fixture = TestBed.createComponent(ApplicationCard);

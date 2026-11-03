@@ -102,7 +102,7 @@ export class ApplicationCard {
 
   protected readonly staleDays = computed(() => {
     const application = this.application();
-    if (application.status !== 'applied') {
+    if (application.status !== 'applied' || application.archived) {
       return null;
     }
     const days = daysSince(application.dateApplied);
