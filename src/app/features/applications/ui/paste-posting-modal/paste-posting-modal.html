@@ -114,19 +114,31 @@
 
             <div class="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <label class="block text-sm">
-                <span class="mb-1 block font-medium text-ink">Company</span>
+                <span class="mb-1 block font-medium text-ink">
+                  Company <span class="text-danger" aria-hidden="true">*</span>
+                </span>
                 <input
                   formControlName="company"
+                  aria-required="true"
                   class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
                 />
+                @if (form.controls.company.invalid && form.controls.company.touched) {
+                  <span class="mt-1 block text-xs text-danger">Company is required</span>
+                }
               </label>
 
               <label class="block text-sm">
-                <span class="mb-1 block font-medium text-ink">Role</span>
+                <span class="mb-1 block font-medium text-ink">
+                  Role <span class="text-danger" aria-hidden="true">*</span>
+                </span>
                 <input
                   formControlName="role"
+                  aria-required="true"
                   class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
                 />
+                @if (form.controls.role.invalid && form.controls.role.touched) {
+                  <span class="mt-1 block text-xs text-danger">Role is required</span>
+                }
               </label>
             </div>
 
@@ -168,12 +180,18 @@
               </label>
 
               <label class="block text-sm">
-                <span class="mb-1 block font-medium text-ink">Date applied</span>
+                <span class="mb-1 block font-medium text-ink">
+                  Date applied <span class="text-danger" aria-hidden="true">*</span>
+                </span>
                 <input
                   type="date"
                   formControlName="dateApplied"
+                  aria-required="true"
                   class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
                 />
+                @if (form.controls.dateApplied.invalid && form.controls.dateApplied.touched) {
+                  <span class="mt-1 block text-xs text-danger">Date applied is required</span>
+                }
               </label>
             </div>
 
