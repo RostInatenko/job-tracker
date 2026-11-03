@@ -14,6 +14,7 @@ import { firstValueFrom } from 'rxjs';
 import { routes } from './app.routes';
 import { authInterceptor } from './core/auth/auth.interceptor';
 import { AuthService } from './core/auth/auth.service';
+import { AuthTokenService } from './core/auth/auth-token.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -24,7 +25,10 @@ export const appConfig: ApplicationConfig = {
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
     provideAppInitializer(() => {
       const authService = inject(AuthService);
-      return firstValueFrom(authService.refresh()).catch(() => undefined);
+      const authToken = inject(AuthTokenService);
+      return firstValueFrom(authService.refresh()).catch(() => {
+        authToken.restoreDemoToken();
+      });
     }),
   ],
 };
