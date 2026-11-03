@@ -77,6 +77,15 @@
             Add from job posting
           </h2>
           <p class="py-8 text-center text-sm text-ink-soft">Reading the posting…</p>
+          <div class="flex justify-end">
+            <button
+              type="button"
+              (click)="onCancelExtract()"
+              class="rounded-md px-3 py-2 text-sm text-ink-soft hover:bg-surface-sunken"
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       }
 
@@ -87,13 +96,15 @@
           </h2>
           <p class="mb-4 text-sm text-danger">{{ errorMessage() }}</p>
           <div class="flex justify-end gap-2">
-            <button
-              type="button"
-              (click)="phase.set('paste')"
-              class="rounded-md px-3 py-2 text-sm text-ink-soft hover:bg-surface-sunken"
-            >
-              Try again
-            </button>
+            @if (canRetry()) {
+              <button
+                type="button"
+                (click)="phase.set('paste')"
+                class="rounded-md px-3 py-2 text-sm text-ink-soft hover:bg-surface-sunken"
+              >
+                Try again
+              </button>
+            }
             <button
               type="button"
               (click)="onSkipToManual()"

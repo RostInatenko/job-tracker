@@ -1,4 +1,6 @@
-import { Component, inject, output, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, DestroyRef, inject, output, signal } from '@angular/core';
+import { Subscription, TimeoutError } from 'rxjs';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CdkTrapFocus } from '@angular/cdk/a11y';
 import { LlmService } from '../../data-access/llm.service';
@@ -11,6 +13,36 @@ import {
 } from '../../data-access/application.model';
 
 type Phase = 'paste' | 'loading' | 'review' | 'error';
+
+interface ExtractionFailure {
+  message: string;
+  canRetry: boolean;
+}
+
+function describeExtractionFailure(error: unknown): ExtractionFailure {
+  if (error instanceof TimeoutError || (error instanceof HttpErrorResponse && error.status === 504)) {
+    return {
+      message: 'The AI service took too long to answer. Try again, or fill the form in manually.',
+      canRetry: true,
+    };
+  }
+  if (error instanceof HttpErrorResponse && error.status === 429) {
+    return {
+      message: 'The AI request limit has been reached for today. Fill the form in manually, or try again tomorrow.',
+      canRetry: false,
+    };
+  }
+  if (error instanceof HttpErrorResponse && error.status === 503) {
+    return {
+      message: 'The AI service is busy right now. Try again in a moment, or fill the form in manually.',
+      canRetry: true,
+    };
+  }
+  return {
+    message: 'Could not extract details from that posting. Try again, or fill the form in manually.',
+    canRetry: true,
+  };
+}
 
 @Component({
   selector: 'app-paste-posting-modal',
@@ -28,9 +60,15 @@ export class PastePostingModal {
   protected readonly workModeOptions = WORK_MODE_OPTIONS;
   protected readonly phase = signal<Phase>('paste');
   protected readonly errorMessage = signal('');
+  protected readonly canRetry = signal(true);
   protected readonly confirmingClose = signal(false);
   protected jobPostingText = '';
   private backdropPointerDown = false;
+  private extraction: Subscription | null = null;
+
+  constructor() {
+    inject(DestroyRef).onDestroy(() => this.extraction?.unsubscribe());
+  }
 
   protected readonly form = this.formBuilder.nonNullable.group({
     company: ['', Validators.required],
@@ -52,7 +90,7 @@ export class PastePostingModal {
 
     this.phase.set('loading');
 
-    this.llmService.extractJobPosting(this.jobPostingText.trim()).subscribe({
+    this.extraction = this.llmService.extractJobPosting(this.jobPostingText.trim()).subscribe({
       next: (extraction) => {
         this.form.patchValue({
           company: extraction.company,
@@ -64,11 +102,18 @@ export class PastePostingModal {
         });
         this.phase.set('review');
       },
-      error: () => {
-        this.errorMessage.set('Could not extract details from that posting. Try again, or fill the form in manually.');
+      error: (error: unknown) => {
+        const failure = describeExtractionFailure(error);
+        this.errorMessage.set(failure.message);
+        this.canRetry.set(failure.canRetry);
         this.phase.set('error');
       },
     });
+  }
+
+  protected onCancelExtract(): void {
+    this.extraction?.unsubscribe();
+    this.phase.set('paste');
   }
 
   protected onSkipToManual(): void {

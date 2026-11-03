@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, timeout } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+
+const EXTRACT_TIMEOUT_MS = 30000;
 
 export interface JobPostingExtraction {
   company: string;
@@ -18,6 +20,8 @@ export class LlmService {
   private readonly baseUrl = `${environment.apiUrl}/llm`;
 
   extractJobPosting(jobPosting: string): Observable<JobPostingExtraction> {
-    return this.http.post<JobPostingExtraction>(`${this.baseUrl}/extract`, { jobPosting });
+    return this.http
+      .post<JobPostingExtraction>(`${this.baseUrl}/extract`, { jobPosting })
+      .pipe(timeout(EXTRACT_TIMEOUT_MS));
   }
 }
