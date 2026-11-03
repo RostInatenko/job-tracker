@@ -17,8 +17,13 @@ export class App {
   protected readonly themeService = inject(ThemeService);
 
   protected readonly isLoggedIn = this.authToken.accessToken;
+  protected readonly isDemo = this.authToken.isDemo;
 
   protected onLogout(): void {
     this.authService.logout().subscribe(() => this.router.navigate(['/login']));
+  }
+
+  protected onCreateAccount(): void {
+    this.authService.logout().subscribe(() => this.router.navigate(['/register']));
   }
 }

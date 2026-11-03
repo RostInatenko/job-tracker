@@ -51,6 +51,16 @@
     </div>
   </header>
 
+  @if (isDemo()) {
+    <div class="border-b border-border bg-surface-sunken px-4 py-2 text-center text-sm text-ink-soft">
+      You're in the demo. Sample data, deleted after 24 hours.
+      <button type="button" (click)="onCreateAccount()" class="font-medium text-ink underline">
+        Create an account
+      </button>
+      to keep your own board.
+    </div>
+  }
+
   <main class="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6">
     <router-outlet />
   </main>

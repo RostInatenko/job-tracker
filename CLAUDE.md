@@ -28,4 +28,5 @@ Angular 21 Kanban board for tracking job applications. Backend lives in the sibl
 
 - Tailwind v4 with the colour tokens in `src/styles.css`. Use the tokens, not raw colours, so dark mode keeps working.
 - Commits follow Angular Conventional Commits: `type(scope): summary`.
-- Pushing to `master` deploys to GitHub Pages through `.github/workflows/deploy.yml` (`npm ci`, build with `--base-href /job-tracker/`).
+- Pushing to `master` deploys to GitHub Pages through `.github/workflows/deploy.yml` (`npm ci`, build with `--base-href /job-tracker/`). The workflow also copies `index.html` to `404.html`, which is what makes direct visits to routes like `/stats` work on static hosting. Keep that step.
+- Demo sessions are recognised from a `demo` claim in the access token (`AuthTokenService.isDemo`); `app.html` shows a banner for them.
