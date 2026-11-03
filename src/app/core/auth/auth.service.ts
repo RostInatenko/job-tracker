@@ -30,6 +30,12 @@ export class AuthService {
       .pipe(tap((res) => this.authToken.setAccessToken(res.accessToken)));
   }
 
+  loginAsDemo(): Observable<LoginResponse> {
+    return this.http
+      .post<LoginResponse>(`${environment.apiUrl}/auth/demo`, {}, { withCredentials: true })
+      .pipe(tap((res) => this.authToken.setAccessToken(res.accessToken)));
+  }
+
   refresh(): Observable<LoginResponse> {
     return this.http
       .post<LoginResponse>(`${environment.apiUrl}/auth/refresh`, {}, { withCredentials: true })

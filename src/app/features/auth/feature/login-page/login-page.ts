@@ -16,6 +16,22 @@ export class LoginPage {
   protected password = '';
   protected readonly error = signal('');
   protected readonly loading = signal(false);
+  protected readonly demoLoading = signal(false);
+
+  protected onTryDemo(): void {
+    this.loading.set(true);
+    this.demoLoading.set(true);
+    this.error.set('');
+
+    this.authService.loginAsDemo().subscribe({
+      next: () => this.router.navigateByUrl('/'),
+      error: () => {
+        this.loading.set(false);
+        this.demoLoading.set(false);
+        this.error.set('The demo is unavailable right now, please try again in a moment.');
+      },
+    });
+  }
 
   protected onSubmit(): void {
     if (!this.email.trim() || !this.password.trim()) {
