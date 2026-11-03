@@ -39,18 +39,34 @@
     @switch (phase()) {
       @case ('paste') {
         <div class="p-6">
-          <h2 id="paste-posting-heading" class="mb-4 text-lg font-semibold text-ink">
+          <h2 id="paste-posting-heading" class="mb-1 text-lg font-semibold text-ink">
             Add from job posting
           </h2>
+          <p class="mb-4 text-sm text-ink-soft">
+            Paste the full text of a job ad from LinkedIn or a company website. AI fills in
+            the company, role, tech stack, salary, work mode and link. You review everything
+            before it's saved.
+          </p>
 
-          <label class="mb-3 block text-sm">
-            <span class="mb-1 block font-medium text-ink">Paste the job posting text</span>
+          <label class="mb-1 block text-sm">
+            <span class="mb-1 block font-medium text-ink">Job posting text</span>
             <textarea
               [(ngModel)]="jobPostingText"
               rows="8"
+              placeholder="Paste the whole job description here, including requirements and salary if listed."
               class="w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm text-ink"
             ></textarea>
           </label>
+          <div class="mb-4 flex flex-wrap items-center justify-between gap-2 text-xs text-ink-faint">
+            <span>The text is sent to Google's Gemini AI to be read.</span>
+            <button
+              type="button"
+              (click)="onUseSample()"
+              class="text-ink-soft underline hover:text-ink"
+            >
+              Try with a sample posting
+            </button>
+          </div>
 
           <div class="flex items-center justify-between">
             <button

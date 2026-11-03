@@ -11,6 +11,7 @@ import {
   WORK_MODE_OPTIONS,
   WorkMode,
 } from '../../data-access/application.model';
+import { SAMPLE_JOB_POSTING } from './sample-job-posting';
 
 type Phase = 'paste' | 'loading' | 'review' | 'error';
 
@@ -114,6 +115,10 @@ export class PastePostingModal {
   protected onCancelExtract(): void {
     this.extraction?.unsubscribe();
     this.phase.set('paste');
+  }
+
+  protected onUseSample(): void {
+    this.jobPostingText = SAMPLE_JOB_POSTING;
   }
 
   protected onSkipToManual(): void {
